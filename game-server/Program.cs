@@ -1,5 +1,5 @@
 ﻿namespace game_server;
-internal class Program {
+internal sealed class Program {
     static void Main(string[] args) {
         new CoreManager().Run();
     }

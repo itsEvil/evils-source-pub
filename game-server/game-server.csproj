@@ -13,4 +13,11 @@
     <ProjectReference Include="..\common\common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Utils\" />
+    <Folder Include="Realm\Logic\Behaviours\" />
+    <Folder Include="Realm\Logic\Database\" />
+    <Folder Include="Realm\Logic\Loot\" />
+  </ItemGroup>
+
 </Project>

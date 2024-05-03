@@ -1,0 +1,9 @@
+﻿<Init>
+	<NewCharacter>
+		<!-- </MaxLevel>-->
+		<!-- </Maxed>-->
+	</NewCharacter>
+	<PotionPrice currency="0">50</PotionPrice>
+	<VaultSlotPrice currency="0">250</VaultSlotPrice>
+	<CharacterSlotPrice currency="0">1000</CharacterSlotPrice>
+</Init>
