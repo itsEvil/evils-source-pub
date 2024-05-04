@@ -89,6 +89,7 @@ public sealed partial class CoreManager {
 
             client.BeginHandling(socket, ip);
             _toAddClient.Enqueue(client);
+            defer.Cancel = true;
         }
     }
     public void AddBack(Client client) {

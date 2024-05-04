@@ -38,7 +38,7 @@ public sealed partial class Client(int id, CoreManager manager) {
 
         IP = ip;
         LastMessageTime = DateTime.Now;
-        DisconnectTime = DateTime.Now + TimeSpan.FromMilliseconds(500);
+        DisconnectTime = DateTime.Now + TimeSpan.FromMilliseconds(1000);
 
         _socket = socket;
         ReceiveAsync();
@@ -58,7 +58,12 @@ public sealed partial class Client(int id, CoreManager manager) {
     //Handled on Network Thread
     public Task NetworkTick() {
         if(_socket is null) {
-            Manager.AddBack(this);
+            Disconnect("SocketIsNull");
+            return Task.CompletedTask;
+        }
+
+        if(DisconnectTime < DateTime.Now) {
+            Disconnect($"TookTooLongToRespond::DCTime:{DisconnectTime}::Now:{DateTime.Now}");
             return Task.CompletedTask;
         }
 
