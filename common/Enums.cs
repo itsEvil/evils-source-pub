@@ -1,5 +1,11 @@
 ﻿namespace common;
-
+public enum WorldTypes { //Not linked to world Id's
+    Generic,
+    Nexus = -1,
+    Vault = -2,
+    Market = -3,
+    Realm = -4,
+}
 public enum Currency {
     Fame,
     Gold,

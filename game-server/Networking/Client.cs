@@ -183,7 +183,12 @@ public sealed partial class Client(int id, CoreManager manager) {
         catch { }
 #endif
 
-        
+        if(Player is not null) {
+            Player.SaveToCharacter();
+            Player.Owner?.LeaveWorld(Player);
+        }
+
+
         Account = null;
         Character = null;
         

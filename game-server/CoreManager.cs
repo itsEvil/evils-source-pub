@@ -10,9 +10,14 @@ public sealed partial class CoreManager() {
     public ConcurrentDictionary<int, Client> Clients = [];
     public static bool Terminate = false;
     public void Run() {
+        Resources.InitXmls("Debug");
+
         SLog.Info("CoreManager::Run");
         Task.Factory.StartNew(AcceptConnections);
         Task.Factory.StartNew(NetworkTick);
+
+
+        GetWorld(World.NexusId, Resources.NameToWorldDesc["Nexus"]);
         RunGameLoop();
         SLog.Info("CoreManager::Run::End");
     }
