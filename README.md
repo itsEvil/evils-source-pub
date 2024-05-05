@@ -27,18 +27,18 @@ Below is my features and performance lists that I aim to achieve.
 Note: Tutorials will be made once I finish with my todo list.
 
 Video tutorials below:
-- 1. Getting started [Not made yet]
-- 2. Setting up ranks [Not made yet]
+- 1a. Getting started [Not made yet]
+- 2a. Setting up ranks [Not made yet]
 - 3a. Adding your first item [Not made yet]
 - 3b. Adding your first tile [Not made yet]
 - 3c. Adding your first enemy [Not made yet]
 - 4a. Creating a new dungeon [Not made yet]
 - 4b. Creating a new dungeon with a custom system (example: Ocean Trench) [Not made yet]
-- 5. Modifing the realm system [Not made yet]
+- 5a. Modifing the realm system [Not made yet]
 - 6a. Explaining behaviour system [Not made yet]
 - 6b. Modifing a enemy behaviour [Not made yet]
 - 6c. Adding a new behaviour [Not made yet]
 - 7a. Adding new packets [Not made yet] 
 - 7b. Adding packets for a party system [Not made yet]
 - 7c. Adding logic for the party system [Not made yet]
-- 8. How to allow your friends to join [Not made yet]
+- 8a. How to allow your friends to join [Not made yet]
