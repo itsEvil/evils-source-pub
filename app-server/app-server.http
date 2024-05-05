@@ -1,11 +1,23 @@
-@app_server_HostAddress = http://localhost:5011
+@app_server_HostAddress = http://localhost:8080
 
-GET {{app_server_HostAddress}}/todos/
+GET {{app_server_HostAddress}}/app/init
 Accept: application/json
 
 ###
 
-GET {{app_server_HostAddress}}/todos/1
+GET {{app_server_HostAddress}}/app/servers
 Accept: application/json
+
+###
+
+POST {{app_server_HostAddress}}/account/register
+Accept: application/json
+Content-Type: application/json
+
+{
+  "email":"1@test.com",
+  "password":"1234512345",
+  "username":"abcdef"
+}
 
 ###

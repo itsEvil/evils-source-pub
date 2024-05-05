@@ -1,4 +1,21 @@
 ﻿namespace common;
+public enum RegisterStatus {
+    InvalidError,
+    NameTaken,
+    EmailTaken,
+    InvalidEmail,
+    InvalidPassword,
+    InvalidName,
+    Ok,
+}
+
+public enum Ranks {
+    None = 0,
+    Donor_1 = 10,
+    Staff = 50,
+    Admin = 70,
+    Owner = 100,
+}
 public enum WorldTypes { //Not linked to world Id's
     Generic,
     Nexus = -1,
