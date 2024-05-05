@@ -1,10 +1,5 @@
 ﻿using common;
 using game_server.Networking;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace game_server.Realm.Worlds;
 public sealed class Vault(int id) : World(id) {
@@ -14,6 +9,6 @@ public sealed class Vault(int id) : World(id) {
             AllowedIds.Add(client.AccountId);
     }
     public override bool IsAllowedAccess(Client client) {
-        return AllowedIds.Contains(client.AccountId) || client.Account?.Rank >= 100;
+        return AllowedIds.Contains(client.AccountId) || client.Account?.Rank >= Ranks.Owner;
     }
 }
