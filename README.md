@@ -1,9 +1,9 @@
 # evils-source-server
  A ROTMG Like private server source made in C# by @itsEvil_
 
-### State: !In development!
+State: In development
 
-### Why make another source when so many exist already?
+## Why make another source when so many exist already?
 They are outdated, run poorly and just have too much garbage in them.
 
 I want this source to be end up being **the** base source that people start new private servers from.
