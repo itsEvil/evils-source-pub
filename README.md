@@ -1,14 +1,15 @@
-# evils-source
+# evils-source-server
  A ROTMG Like private server source made in C# by @itsEvil_
+
+### State: !In development!
 
 ### Why make another source when so many exist already?
 They are outdated, run poorly and just have too much garbage in them.
 
 I want this source to be end up being **the** base source that people start new private servers from.
 
-
 ### Todo
-Below is my features and performance lists that I will achieve with this source.
+Below is my features and performance lists that I aim to achieve.
 
 ### Features
 - Behaviour system
@@ -23,6 +24,7 @@ Below is my features and performance lists that I will achieve with this source.
 - Up to 200 players at 10 game tps and 20 network ticks.
 
 ### Tutorials
+Note: Tutorials will be made once I finish with my todo list.
 
 Video tutorials below:
 - 1. Getting started [Not made yet]
