@@ -10,9 +10,10 @@ public enum InPacket {
     Failure, //Disconnect
     Hello, //game version
     Login, //login details
-    Move, //
+    NewTickAck, //basically move packet
     Shoot,
     Hit,
+    UpdateAck,
 }
 
 public enum OutPacket {
@@ -22,4 +23,6 @@ public enum OutPacket {
     MoveAck, //
     ShootAck, 
     HitAck,
+    Update,
+    NewTick,
 }

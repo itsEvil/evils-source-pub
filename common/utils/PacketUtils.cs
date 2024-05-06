@@ -2,7 +2,7 @@
 using System.Buffers.Binary;
 using System.Text;
 
-namespace game_server.Networking;
+namespace common.utils;
 public static class PacketUtils
 {
     public static void WriteByte(Span<byte> buffer, byte value, ref int ptr)

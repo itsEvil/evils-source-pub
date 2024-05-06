@@ -1,6 +1,6 @@
 ﻿using common;
 
-namespace game_server.Realm;
+namespace game_server.Core;
 public class Map(int width, int height) {
     public readonly WMapTile[] Tiles = new WMapTile[width * height];
     public readonly int Height = width;

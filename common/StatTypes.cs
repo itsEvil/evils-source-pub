@@ -10,4 +10,6 @@ public enum StatType {
     MaxHp,
     Mp,
     MaxMp,
+    PublicInventory,
+    PrivateInventory,
 }

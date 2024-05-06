@@ -1,6 +1,8 @@
 ﻿using common;
 using common.db;
-using game_server.Realm.Entities;
+using common.utils;
+using game_server.Core.Entities;
+using System.Buffers.Binary;
 using System.Net.Sockets;
 
 namespace game_server.Networking;
@@ -68,10 +70,34 @@ public sealed partial class Client(int id, CoreManager manager) {
         }
 
         while(OutPackets.TryDequeue(out var packet)) {
-
+            WritePacket(packet);
+            Send.PacketsWritten++;
         }
 
+        if (Send.PacketLength == 0)
+            return Task.CompletedTask;
+
+        FlushAsync();
+
         return Task.CompletedTask;
+    }
+    private void WritePacket(IOutPacket packet) {
+
+        var buffer = Send.Buffer.AsSpan();
+        int ptr = Send.PacketLength;
+        
+        ptr += LENGTH_PREFIX_WITH_ID;
+        PacketUtils.WriteByte(buffer, packet.Id, ref ptr);
+        
+        var beforeWritePtr = ptr;
+        packet.Write(buffer, ref ptr);
+        var afterWritePtr = ptr;
+        
+        var packetSize = afterWritePtr - beforeWritePtr;
+        var totalSize = packetSize + LENGTH_PREFIX;
+
+        BinaryPrimitives.WriteInt32BigEndian(buffer[Send.PacketLength..(Send.PacketLength + LENGTH_PREFIX_WITH_ID)], totalSize);
+        Send.PacketLength += totalSize;
     }
     private async void FlushAsync() {
         if (_socket is null)
@@ -119,6 +145,9 @@ public sealed partial class Client(int id, CoreManager manager) {
                 SLog.Error($"Could not receive data from {Account?.Name ?? "[unconnected]"} ({IP}): {e}");
         }
     }
+    public void Enqueue(IOutPacket packet) {
+        OutPackets.Enqueue(packet);
+    }
     private void ProcessPacket(int length)
     {
         try
@@ -159,6 +188,9 @@ public sealed partial class Client(int id, CoreManager manager) {
             SLog.Warn("FailedToFindPacket::{0}", packetId);
             return;
         }
+
+        LastMessageTime = DateTime.Now;
+        DisconnectTime = DateTime.Now + TimeSpan.FromMilliseconds(3000); //Remember about that packets have to go to and come back from clients (RTT)
 
         //Enqueue to be handled on main thread
         InPackets.Enqueue(packet);

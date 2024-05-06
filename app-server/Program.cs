@@ -12,13 +12,13 @@ public class Program {
     public static void Main(string[] args) {
 
         var builder = WebApplication.CreateSlimBuilder(args);
+        builder.Logging.ClearProviders();
 
         builder.Services.ConfigureHttpJsonOptions(options => {
             options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
             options.SerializerOptions.TypeInfoResolverChain.Insert(1, SourceGenerationContext.Default);
         });
 
-        builder.Logging.ClearProviders();
 
         var app = builder.Build();
 

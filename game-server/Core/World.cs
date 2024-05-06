@@ -1,9 +1,10 @@
 ﻿using common;
 using game_server.Networking;
-using game_server.Realm.Entities;
-using game_server.Realm.Worlds;
+using game_server.Core.Entities;
+using game_server.Core.Worlds;
+using System.Numerics;
 
-namespace game_server.Realm;
+namespace game_server.Core;
 public class World {
     private static int NextWorldId = 1;
     public const int NexusId = -1;
@@ -31,7 +32,7 @@ public class World {
         _toAddEntities.Add(Entity.Resolve(EntityTypes.Entity, 1));
     }
     public virtual void EnterWorld(Entity entity) {
-        entity.EnterWorld(this);
+        entity.EnterWorld(this, new Vector2(0,0));
         if(entity is Player player) {
             Players.Add(player.Id, player);
         } else {
@@ -84,7 +85,7 @@ public class World {
             WorldTypes.Vault => new Vault(NextWorldId++),
             WorldTypes.Market => new Market(MarketId),
             WorldTypes.Nexus => new Nexus(NexusId),
-            WorldTypes.Realm => new Worlds.Realm(NexusId),
+            WorldTypes.Realm => new Realm(NexusId),
             _ => new World(NextWorldId++),
         };
     }

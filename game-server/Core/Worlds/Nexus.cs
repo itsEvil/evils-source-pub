@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace game_server.Realm.Worlds;
+namespace game_server.Core.Worlds;
 public sealed class Nexus(int id) : World(id) {
 
 }

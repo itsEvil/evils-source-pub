@@ -1,6 +1,7 @@
 ﻿using common;
 using game_server.Networking;
-using game_server.Realm;
+using game_server.Core;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace game_server;
 public sealed partial class CoreManager {
+    public ITransaction Transaction;
     public Dictionary<int, World> Worlds = []; //worlds in the server
     private readonly List<World> _toAddWorlds  = [];
     private readonly List<int> _toRemoveWorlds = [];
@@ -17,9 +19,11 @@ public sealed partial class CoreManager {
     private List<Task> _gameTasks = new(MaxConnections);
     public async void RunGameLoop() {
         var watch = Stopwatch.StartNew();
+        
         while (!Terminate) {
-            //SLog.Debug("Worlds::{0}::Tick::{1}::ToAdd::{2}::ToRemove::{3}", Worlds.Count, Time.GameTickCount, _toAddWorlds.Count, _toRemoveWorlds.Count);
             watch.Restart();
+            Transaction = Redis.Database.CreateTransaction();
+            //SLog.Debug("Worlds::{0}::Tick::{1}::ToAdd::{2}::ToRemove::{3}", Worlds.Count, Time.GameTickCount, _toAddWorlds.Count, _toRemoveWorlds.Count);
             for (int i = 0; i < _toRemoveWorlds.Count; i++) {
                 var id = _toRemoveWorlds[i];
                 Worlds.Remove(id);
@@ -48,6 +52,7 @@ public sealed partial class CoreManager {
             await Task.WhenAll(_gameTasks);
             _gameTasks.Clear();
 
+            await Transaction.ExecuteAsync();
             var elapsed = watch.Elapsed.TotalMilliseconds;
             var sleepTime = Math.Max(0, Time.PerGameTick - (int)elapsed);
             Thread.Sleep(sleepTime);

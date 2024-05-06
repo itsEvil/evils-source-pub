@@ -7,20 +7,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace game_server.Realm.Entities;
-public sealed class Player(int id, int objectType) : Entity(id, objectType), IInventory {
+namespace game_server.Core.Entities;
+public sealed partial class Player(int id, int objectType) : Entity(id, objectType), IInventory {
     public ItemModel[] Inventory { get; set; } = [];
     public Client? Client = null;
 
-    public SyncedVariable<int> MP = SyncedVariable<int>.EmptyInt;
-    public SyncedVariable<int> MaxMP = SyncedVariable<int>.EmptyInt;
+    public int MP = 0;
+    public int MaxMP = 0;
     public void Init(Client client) {
         Client = client;
 
         if(Client.Character is not null) {
-
+            Inventory = [.. Client.Character.Inventory];
         }
-
         if(Client.Account is not null) {
             Name = Client.Account.Name;
         }
@@ -29,8 +28,10 @@ public sealed class Player(int id, int objectType) : Entity(id, objectType), IIn
     }
     public override void Export() {
         base.Export();
-        Stats[StatType.Mp] = MP.Value;
-        Stats[StatType.MaxMp] = MaxMP.Value;
+        Stats[StatType.Mp] = MP;
+        Stats[StatType.MaxMp] = MaxMP;
+        Stats[StatType.PublicInventory] = new int[4] { Inventory[0].ItemType, Inventory[1].ItemType, Inventory[2].ItemType, Inventory[3].ItemType };
+        Stats[StatType.PrivateInventory] = Inventory;
     }
     public void SaveToCharacter() {
         if (Client is null || Client.Character is null) {
@@ -39,6 +40,6 @@ public sealed class Player(int id, int objectType) : Entity(id, objectType), IIn
         }
 
         Client.Character.Inventory = Inventory;
-
+        Client.Character.FlushAsync();
     }
 }

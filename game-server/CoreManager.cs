@@ -1,11 +1,13 @@
 ﻿using common;
+using common.db;
 using game_server.Networking;
-using game_server.Realm;
+using game_server.Core;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
 namespace game_server;
 public sealed partial class CoreManager() {
+    public static readonly RedisDb Redis = new();
     public static readonly Stopwatch Timer = Stopwatch.StartNew(); //Time since application start
     public ConcurrentDictionary<int, Client> Clients = [];
     public static bool Terminate = false;
