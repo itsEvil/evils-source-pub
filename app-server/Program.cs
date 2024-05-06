@@ -50,7 +50,6 @@ public class Program {
     }
 
     private static void MapCharacterGroup(WebApplication app) {
-
         var charGroup = app.MapGroup("/char");
         
     }

@@ -58,7 +58,7 @@ public static class SLog
 {
     private static bool _terminating = false;
     private static readonly string _path = string.Empty; //directory of the logs folder
-    private static ConcurrentQueue<ConsoleMessage> _messages = new(); //queue of messages to write to console
+    private static readonly ConcurrentQueue<ConsoleMessage> _messages = new(); //queue of messages to write to console
     //init logging directory
     static SLog()
     {
@@ -180,17 +180,10 @@ public static class SLog
         _terminating = true;
     }
 }
-public readonly struct ConsoleMessage
+public readonly struct ConsoleMessage(string message, ConsoleColor foreground, ConsoleColor background, LogLevel level)
 {
-    public readonly string Message;
-    public readonly ConsoleColor Foreground;
-    public readonly ConsoleColor Background;
-    public readonly LogLevel Level;
-    public ConsoleMessage(string message, ConsoleColor foreground, ConsoleColor background, LogLevel level)
-    {
-        Message = message;
-        Foreground = foreground;
-        Background = background;
-        Level = level;
-    }
+    public readonly string Message = message;
+    public readonly ConsoleColor Foreground = foreground;
+    public readonly ConsoleColor Background = background;
+    public readonly LogLevel Level = level;
 }

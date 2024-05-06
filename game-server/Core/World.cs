@@ -5,7 +5,8 @@ using game_server.Core.Worlds;
 using System.Numerics;
 
 namespace game_server.Core;
-public class World {
+public class World(int id)
+{
     private static int NextWorldId = 1;
     public const int NexusId = -1;
     public const int MarketId = -2;
@@ -18,13 +19,11 @@ public class World {
     public readonly Dictionary<int, Entity> Entities = [];
     public readonly Dictionary<int, Player> Players = [];
 
-    public readonly int Id;
+    public readonly int Id = id;
     public readonly DateTime TimeUntilLeave = DateTime.Now + TimeSpan.FromSeconds(30);
-    public WorldDesc Descriptor { get; private set; }
-    private Map _map;
-    public World(int id) {
-        Id = id;
-    }
+    public WorldDesc? Descriptor { get; private set; }
+    private Map? _map;
+
     public virtual void Init(WorldDesc descriptor, Client? client = null) {
         Descriptor = descriptor;
         _map = new Map(50, 50);

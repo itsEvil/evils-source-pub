@@ -58,7 +58,7 @@ public sealed partial class CoreManager {
                 continue;
             }
 
-            var ip = socket.RemoteEndPoint.ToString().Split(':')[0];
+            var ip = socket.RemoteEndPoint?.ToString()?.Split(':')[0] ?? "unknown_endpoint";
             SLog.Debug("NewConnection::{0}", ip);
             if(_bannedToUnbanTime.TryGetValue(ip, out var banTime)) {
                 if (DateTime.Now - banTime > TimeSpan.Zero) {
@@ -103,6 +103,9 @@ public sealed partial class CoreManager {
         }
 
         foreach (var id in ids) {
+            if(Clients.TryGetValue(id, out var client)) {
+                client.ForceDisconnect = true;
+            }
         }
     }
     private static void TryCloseSocket(Socket socket) {

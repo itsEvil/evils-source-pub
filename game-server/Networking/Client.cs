@@ -59,8 +59,8 @@ public sealed partial class Client(int id, CoreManager manager) {
 
     //Handled on Network Thread
     public Task NetworkTick() {
-        if(_socket is null) {
-            Disconnect("SocketIsNull");
+        if(_socket is null || ForceDisconnect) {
+            Disconnect("SocketIsNullOrDisconnected");
             return Task.CompletedTask;
         }
 

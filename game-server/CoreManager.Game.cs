@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace game_server;
 public sealed partial class CoreManager {
-    public ITransaction Transaction;
+    public ITransaction? Transaction = null;
     public Dictionary<int, World> Worlds = []; //worlds in the server
     private readonly List<World> _toAddWorlds  = [];
     private readonly List<int> _toRemoveWorlds = [];
@@ -65,7 +65,7 @@ public sealed partial class CoreManager {
     public void RemoveWorld(int worldId) {
         _toRemoveWorlds.Add(worldId);
     }
-    public World GetWorld(int id, WorldDesc descriptor, Client client = null) {
+    public World GetWorld(int id, WorldDesc descriptor, Client? client = null) {
         if(Worlds.TryGetValue(id, out var world)) {
             if (client is not null)
                 world.IsAllowedAccess(client);
