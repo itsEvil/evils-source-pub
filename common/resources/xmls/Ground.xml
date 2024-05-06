@@ -1,5 +1,5 @@
 ﻿<GroundTypes>
-	<Ground type="0x0001" id="Black Water">
+	<Ground id="0x0001" name="Black Water">
 		<Texture>
 			<File>lofiEnvironment2</File>
 			<Index>0x09</Index>
@@ -8,7 +8,7 @@
 		<NoWalk/>
 		<Speed>1</Speed>
 	</Ground>
-	<Ground type="0x0002" id="Black Water Light">
+	<Ground id="0x0002" name="Black Water Light">
 		<Texture>
 			<File>lofiEnvironment2</File>
 			<Index>0x0a</Index>
@@ -18,20 +18,20 @@
 		<BlendPriority>2</BlendPriority>
 		<Speed>0.7</Speed>
 	</Ground>
-	<Ground type="0x0003" id="Wood Panel Floor">
+	<Ground id="0x0003" name="Wood Panel Floor">
 		<Texture>
 			<File>lofiEnvironment2</File>
 			<Index>0x0d</Index>
 		</Texture>
 	</Ground>
-	<Ground type="0x0004" id="Wood Panel Floor Speedy">
+	<Ground id="0x0004" name="Wood Panel Floor Speedy">
 		<Texture>
 			<File>lofiEnvironment2</File>
 			<Index>0x0d</Index>
 		</Texture>
 		<Speed>1.4</Speed>
 	</Ground>
-	<Ground type="0x0005" id="Wood Plank Floor">
+	<Ground id="0x0005" name="Wood Plank Floor">
 		<RandomTexture>
 			<Texture>
 				<File>lofiEnvironment2</File>

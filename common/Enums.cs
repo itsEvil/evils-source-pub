@@ -80,3 +80,11 @@ public enum Terrain : byte {
     ShorePlains,
     BeachTowels,
 }
+
+public enum ObjectClass {
+    GameObject,
+    Player,
+    Equipment,
+    Character,
+    Projectile,
+}

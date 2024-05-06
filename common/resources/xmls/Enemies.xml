@@ -1,5 +1,5 @@
 ﻿<Objects>
-	<Object type="0x1000" id="Pirate">
+	<Object id="0x1000" name="Pirate">
 		<Group>Pirates</Group>
 		<Enemy />
 		<Class>Character</Class>

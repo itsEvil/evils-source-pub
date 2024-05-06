@@ -1,5 +1,5 @@
 ﻿<Objects>
-	<Object type="0x2000" id="Energy Staff">
+	<Object id="0x2000" name="Energy Staff">
 		<Class>Equipment</Class>
 		<Item/>
 		<Texture>
@@ -25,7 +25,7 @@
 		<ArcGap>0</ArcGap>
 		<OldSound>magicShoot</OldSound>
 	</Object>
-	<Object type="0x2001" id="Fire Spray Spell">
+	<Object id="0x2001" name="Fire Spray Spell">
 		<Class>Equipment</Class>
 		<Item />
 		<Texture>

@@ -1,5 +1,5 @@
 ﻿<Objects>
-	<Object type="0x0001" id="Wizard">
+	<Object id="0x0001" name="Wizard">
 		<Class>Player</Class>
 		<Description>The wizard deals damage from a long distance and blasts enemies with powerful spells.</Description>
 		<AnimatedTexture>

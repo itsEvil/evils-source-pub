@@ -13,7 +13,7 @@ public sealed partial class CoreManager {
     public static bool Terminate = false;
     public CoreManager() {
         SLog.Info("CoreManager::ctor");
-        Resources.InitXmls("Debug");
+        Resources.InitXmls(Path.Combine("resources", "xmls"));
         _ = Task.Factory.StartNew(AcceptConnections);
         _ = Task.Factory.StartNew(NetworkTick);
         

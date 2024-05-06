@@ -1,12 +1,12 @@
 ﻿<Objects>
-	<Object type="0x0100" id="Blade">
+	<Object id="0x0100" name="Blade">
 		<Class>Projectile</Class>
 		<Texture>
 			<File>lofiObj</File>
 			<Index>0xf6</Index>
 		</Texture>
 	</Object>
-	<Object type="0x0500" id="Energy Staff Shot">
+	<Object id="0x0500" name="Energy Staff Shot">
 		<Class>Projectile</Class>
 		<Texture>
 			<File>tieredItems</File>
@@ -14,7 +14,7 @@
 		</Texture>
 		<AngleCorrection>1</AngleCorrection>
 	</Object>
-	<Object type="0x0501" id="Fire Bolt">
+	<Object id="0x0501" name="Fire Bolt">
 		<Class>Projectile</Class>
 		<Texture>
 			<File>lofiObj</File>

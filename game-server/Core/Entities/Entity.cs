@@ -51,7 +51,6 @@ public class Entity(int id, int objectType) {
     public virtual void Death(string killer = "") {
         SLog.Debug("KilledBy::{0}", killer);
         Owner?.LeaveWorld(this);
-        CoreManager.Terminate = true;
     }
     public bool HitByProjectile(Projectile proj) {
         HP -= proj.Damage;

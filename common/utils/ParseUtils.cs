@@ -4,9 +4,9 @@ using System.Xml.Linq;
 
 namespace common.utils;
 
-public static class ParseUtils
+public static partial class ParseUtils
 {
-    public static string ParseString(this XElement element, string name, string undefined = null)
+    public static string ParseString(this XElement element, string name, string undefined = "")
     {
         var value = name[0].Equals('@') ? element.Attribute(name.Remove(0, 1))?.Value : element.Element(name)?.Value;
         if (string.IsNullOrWhiteSpace(value)) return undefined;
@@ -17,7 +17,7 @@ public static class ParseUtils
     {
         var value = name[0].Equals('@') ? element.Attribute(name.Remove(0, 1))?.Value : element.Element(name)?.Value;
         if (string.IsNullOrWhiteSpace(value)) return undefined;
-        return int.Parse(value);
+        return (value.StartsWith("0x") ? int.Parse(value[2..], NumberStyles.HexNumber) : int.Parse(value));
     }
 
     public static long ParseLong(this XElement element, string name, long undefined = 0)
@@ -78,7 +78,7 @@ public static class ParseUtils
         try {
             return (T)Enum.Parse(typeof(T), value.Replace(" ", ""), true);
         }catch (Exception) {
-            Console.WriteLine($"{value} not found in {nameof(T)} enum");
+            SLog.Error($"{value} not found in {typeof(T).Name} enum");
             return undefined;
         }
     }
@@ -87,7 +87,7 @@ public static class ParseUtils
     {
         var value = name[0].Equals('@') ? element.Attribute(name.Remove(0, 1))?.Value : element.Element(name)?.Value;
         if (string.IsNullOrWhiteSpace(value)) return undefined;
-        value = Regex.Replace(value, @"\s+", "");
+        value = SpaceRegex().Replace(value, "");
         return value.Split(seperator);
     }
 
@@ -95,7 +95,7 @@ public static class ParseUtils
     {
         var value = name[0].Equals('@') ? element.Attribute(name.Remove(0, 1))?.Value : element.Element(name)?.Value;
         if (string.IsNullOrWhiteSpace(value)) return undefined;
-        value = Regex.Replace(value, @"\s+", "");
+        value = SpaceRegex().Replace(value, "");
         return ParseStringArray(element, name, seperator).Select(k => int.Parse(k)).ToArray();
     }
 
@@ -103,7 +103,7 @@ public static class ParseUtils
     {
         var value = name[0].Equals('@') ? element.Attribute(name.Remove(0, 1))?.Value : element.Element(name)?.Value;
         if (string.IsNullOrWhiteSpace(value)) return undefined;
-        value = Regex.Replace(value, @"\s+", "");
+        value = SpaceRegex().Replace(value, "");
         return ParseStringArray(element, name, seperator).Select(k => (ushort)(k.StartsWith("0x") ? Int32.Parse(k.Substring(2), NumberStyles.HexNumber) : Int32.Parse(k))).ToArray();
     }
 
@@ -111,7 +111,7 @@ public static class ParseUtils
     {
         var value = name[0].Equals('@') ? element.Attribute(name.Remove(0, 1))?.Value : element.Element(name)?.Value;
         if (string.IsNullOrWhiteSpace(value)) return undefined;
-        value = Regex.Replace(value, @"\s+", "");
+        value = SpaceRegex().Replace(value, "");
         return ParseStringArray(element, name, seperator).Select(k => int.Parse(k)).ToList();
     }
 
@@ -119,7 +119,10 @@ public static class ParseUtils
     {
         var value = name[0].Equals('@') ? element.Attribute(name.Remove(0, 1))?.Value : element.Element(name)?.Value;
         if (string.IsNullOrWhiteSpace(value)) return undefined;
-        value = Regex.Replace(value, @"\s+", "");
+        value = SpaceRegex().Replace(value, "");
         return ParseStringArray(element, name, seperator).Select(k => uint.Parse(k)).ToList();
     }
+
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex SpaceRegex();
 }

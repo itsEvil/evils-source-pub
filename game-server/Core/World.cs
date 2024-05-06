@@ -29,7 +29,8 @@ public class World(int id, CoreManager manager)
         Descriptor = descriptor;
         _map = new Map(50, 50);
 
-        _toAddEntities.Add(Entity.Resolve(EntityTypes.Entity, 1));
+        
+        _toAddEntities.Add(Entity.Resolve(EntityTypes.Entity, Resources.NameToObjectDesc["Pirate"].Id));
     }
     public virtual void EnterWorld(Entity entity) {
         entity.EnterWorld(this, new Vector2(0,0));

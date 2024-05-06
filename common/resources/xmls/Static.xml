@@ -1,5 +1,5 @@
 ﻿<Objects>
-	<Object type="0x2000" id="White Wall">
+	<Object id="0x2000" name="White Wall">
 		<Class>Wall</Class>
 		<Texture>
 			<File>lofiEnvironment2</File>
