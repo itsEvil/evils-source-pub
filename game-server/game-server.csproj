@@ -15,9 +15,9 @@
 
   <ItemGroup>
     <Folder Include="Utils\" />
-    <Folder Include="Realm\Logic\Behaviours\" />
-    <Folder Include="Realm\Logic\Database\" />
-    <Folder Include="Realm\Logic\Loot\" />
+    <Folder Include="Core\Logic\Behaviours\" />
+    <Folder Include="Core\Logic\Database\" />
+    <Folder Include="Core\Logic\Loot\" />
   </ItemGroup>
 
 </Project>

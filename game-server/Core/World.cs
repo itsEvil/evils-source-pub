@@ -5,8 +5,9 @@ using game_server.Core.Worlds;
 using System.Numerics;
 
 namespace game_server.Core;
-public class World(int id)
+public class World(int id, CoreManager manager)
 {
+    public readonly CoreManager Manager = manager;
     private static int NextWorldId = 1;
     public const int NexusId = -1;
     public const int MarketId = -2;
@@ -73,19 +74,19 @@ public class World(int id)
         _tasks.Clear();
     }
     public virtual bool IsAllowedAccess(Client client) { return true; }
-    public static World Resolve(int worldId) {
+    public static World Resolve(int worldId, CoreManager manager) {
         if (worldId > 0) {
-            return Resolve(WorldTypes.Generic);
+            return Resolve(WorldTypes.Generic, manager);
         }
-        return Resolve((WorldTypes)worldId);
+        return Resolve((WorldTypes)worldId, manager);
     }
-    public static World Resolve(WorldTypes type) {
+    public static World Resolve(WorldTypes type, CoreManager manager) {
         return type switch {
-            WorldTypes.Vault => new Vault(NextWorldId++),
-            WorldTypes.Market => new Market(MarketId),
-            WorldTypes.Nexus => new Nexus(NexusId),
-            WorldTypes.Realm => new Realm(NexusId),
-            _ => new World(NextWorldId++),
+            WorldTypes.Vault => new Vault(NextWorldId++, manager),
+            WorldTypes.Market => new Market(MarketId, manager),
+            WorldTypes.Nexus => new Nexus(NexusId, manager),
+            WorldTypes.Realm => new Realm(NexusId, manager),
+            _ => new World(NextWorldId++, manager),
         };
     }
 }

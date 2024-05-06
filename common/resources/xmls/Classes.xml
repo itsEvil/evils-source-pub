@@ -1,0 +1,32 @@
+﻿<Objects>
+	<Object type="0x0001" id="Wizard">
+		<Class>Player</Class>
+		<Description>The wizard deals damage from a long distance and blasts enemies with powerful spells.</Description>
+		<AnimatedTexture>
+			<File>players</File>
+			<Index>2</Index>
+		</AnimatedTexture>
+		<HitSound>player/wizard_hit</HitSound>
+		<DeathSound>player/wizard_death</DeathSound>
+		<Player />
+		<BloodProb>1.0</BloodProb>
+		<SlotTypes>2, 13, 6, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0</SlotTypes>
+		<Equipment>0x2000, 0x2001, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1</Equipment>
+		<MaxHitPoints max="670">100</MaxHitPoints>
+		<MaxMagicPoints max="385">100</MaxMagicPoints>
+		<Attack max="70">12</Attack>
+		<Defense max="25">0</Defense>
+		<Speed max="50">10</Speed>
+		<Dexterity max="65">15</Dexterity>
+		<HpRegen max="40">12</HpRegen>
+		<MpRegen max="75">12</MpRegen>
+		<LevelIncrease min="20" max="30">MaxHitPoints</LevelIncrease>
+		<LevelIncrease min="5" max="15">MaxMagicPoints</LevelIncrease>
+		<LevelIncrease min="1" max="2">Attack</LevelIncrease>
+		<LevelIncrease min="0" max="0">Defense</LevelIncrease>
+		<LevelIncrease min="0" max="2">Speed</LevelIncrease>
+		<LevelIncrease min="1" max="2">Dexterity</LevelIncrease>
+		<LevelIncrease min="0" max="1">HpRegen</LevelIncrease>
+		<LevelIncrease min="0" max="2">MpRegen</LevelIncrease>
+	</Object>
+</Objects>

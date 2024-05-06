@@ -17,48 +17,6 @@ public sealed partial class CoreManager {
     private readonly List<int> _toRemoveWorlds = [];
 
     private List<Task> _gameTasks = new(MaxConnections);
-    public async void RunGameLoop() {
-        var watch = Stopwatch.StartNew();
-        
-        while (!Terminate) {
-            watch.Restart();
-            Transaction = Redis.Database.CreateTransaction();
-            //SLog.Debug("Worlds::{0}::Tick::{1}::ToAdd::{2}::ToRemove::{3}", Worlds.Count, Time.GameTickCount, _toAddWorlds.Count, _toRemoveWorlds.Count);
-            for (int i = 0; i < _toRemoveWorlds.Count; i++) {
-                var id = _toRemoveWorlds[i];
-                Worlds.Remove(id);
-            }
-            _toRemoveWorlds.Clear();
-
-            for (int i = 0; i < _toAddWorlds.Count; i++) {
-                var world = _toAddWorlds[i];
-                if (Worlds.ContainsKey(world.Id)) {
-                    SLog.Error("WorldAlreadyExistsWithId::{0}::Overwriting!", world.Id);
-                }
-
-                Worlds[world.Id] = world;
-            }
-            _toAddWorlds.Clear();
-
-            foreach (var (_, client) in Clients)
-                _gameTasks.Add(client.Tick());
-
-            await Task.WhenAll(_gameTasks);
-            _gameTasks.Clear();
-
-            foreach (var (_, world) in Worlds)
-                _gameTasks.Add(world.Tick());
-
-            await Task.WhenAll(_gameTasks);
-            _gameTasks.Clear();
-
-            await Transaction.ExecuteAsync();
-            var elapsed = watch.Elapsed.TotalMilliseconds;
-            var sleepTime = Math.Max(0, Time.PerGameTick - (int)elapsed);
-            Thread.Sleep(sleepTime);
-            Time.GameTickCount++;
-        }
-    }
     public void AddWorld(World world) {
         _toAddWorlds.Add(world);
     }
@@ -73,7 +31,7 @@ public sealed partial class CoreManager {
             return world;
         }
 
-        world = World.Resolve(id);
+        world = World.Resolve(id, this);
         world.Init(descriptor, client);
 
         AddWorld(world);

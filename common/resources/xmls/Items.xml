@@ -1,0 +1,52 @@
+﻿<Objects>
+	<Object type="0x2000" id="Energy Staff">
+		<Class>Equipment</Class>
+		<Item/>
+		<Texture>
+			<File>tieredItems</File>
+			<Index>0x00</Index>
+		</Texture>
+		<SlotType>17</SlotType>
+		<Tier>0</Tier>
+		<Description>A magical wooden staff topped with a white crystal.</Description>
+		<RateOfFire>1</RateOfFire>
+		<Sound>weapon/fire_wand</Sound>
+		<Projectile>
+			<ObjectId>Energy Staff Shot</ObjectId>
+			<Speed>180</Speed>
+			<MinDamage>10</MinDamage>
+			<MaxDamage>25</MaxDamage>
+			<LifetimeMS>475</LifetimeMS>
+			<Amplitude>0.5</Amplitude>
+			<Frequency>2</Frequency>
+		</Projectile>
+		<BagType>1</BagType>
+		<NumProjectiles>2</NumProjectiles>
+		<ArcGap>0</ArcGap>
+		<OldSound>magicShoot</OldSound>
+	</Object>
+	<Object type="0x2001" id="Fire Spray Spell">
+		<Class>Equipment</Class>
+		<Item />
+		<Texture>
+			<File>lofiObj6</File>
+			<Index>0x40</Index>
+		</Texture>
+		<SlotType>11</SlotType>
+		<Tier>0</Tier>
+		<Description>A spell that shoots fire in all directions.</Description>
+		<Sound>spell/fire_spray</Sound>
+		<Projectile>
+			<ObjectId>Fire Bolt</ObjectId>
+			<Speed>160</Speed>
+			<MinDamage>25</MinDamage>
+			<MaxDamage>40</MaxDamage>
+			<LifetimeMS>1000</LifetimeMS>
+		</Projectile>
+		<Usable />
+		<BagType>1</BagType>
+		<MpCost>30</MpCost>
+		<Activate>BulletNova</Activate>
+		<feedPower>5</feedPower>
+	</Object>
+</Objects>

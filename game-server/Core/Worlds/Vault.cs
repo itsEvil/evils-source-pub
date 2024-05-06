@@ -2,7 +2,7 @@
 using game_server.Networking;
 
 namespace game_server.Core.Worlds;
-public sealed class Vault(int id) : World(id) {
+public sealed class Vault(int id, CoreManager manager) : World(id, manager) {
     public List<int> AllowedIds = []; //Change to a HashSet<int> for worlds where you allow a lot of Clients (50+) that can't be easily sorted out
     public override void Init(WorldDesc descriptor, Client? client = null) {
         if (client is not null)

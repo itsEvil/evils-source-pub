@@ -1,0 +1,22 @@
+﻿<Objects>
+	<Object type="0x2000" id="White Wall">
+		<Class>Wall</Class>
+		<Texture>
+			<File>lofiEnvironment2</File>
+			<Index>0xa0</Index>
+		</Texture>
+		<Top>
+			<Texture>
+				<File>lofiEnvironment2</File>
+				<Index>0xa3</Index>
+			</Texture>
+		</Top>
+		<HitSound>monster/stone_walls_hit</HitSound>
+		<DeathSound>monster/stone_walls_death</DeathSound>
+		<Static />
+		<FullOccupy />
+		<OccupySquare />
+		<EnemyOccupySquare />
+		<BlocksSight />
+	</Object>
+</Objects>

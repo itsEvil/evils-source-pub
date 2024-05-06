@@ -17,7 +17,10 @@ public static class Resources {
             SLog.Debug("Resources::InitXmls::ResourcePathIsEmptyOrNull");
             return;
         }
-        SLog.Debug("Resources::InitXmls::Path::{0}", resourcePath);
+
+        var dir = Directory.GetCurrentDirectory();
+        SLog.Debug("Resources::InitXmls::Path::{0}::{1}", dir, resourcePath);
+
 
         var nexus = new WorldDesc(WorldTypes.Nexus, "Nexus");
         NameToWorldDesc[nexus.WorldName] = nexus;

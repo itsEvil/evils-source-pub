@@ -1,0 +1,23 @@
+﻿<Objects>
+	<Object type="0x1000" id="Pirate">
+		<Group>Pirates</Group>
+		<Enemy />
+		<Class>Character</Class>
+		<AnimatedTexture>
+			<File>chars8x8rBeach</File>
+			<Index>1</Index>
+		</AnimatedTexture>
+		<HitSound>monster/pirates_hit</HitSound>
+		<DeathSound>monster/pirates_death</DeathSound>
+		<Size>100</Size>
+		<MaxHitPoints>5</MaxHitPoints>
+		<Defense>0</Defense>
+		<Terrain>ShoreSand</Terrain>
+		<Projectile id="0">
+			<ObjectId>Blade</ObjectId>
+			<Damage>4</Damage>
+			<Speed>40</Speed>
+			<LifetimeMS>600</LifetimeMS>
+		</Projectile>
+	</Object>
+</Objects>
