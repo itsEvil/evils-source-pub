@@ -66,6 +66,7 @@ public sealed partial class CoreManager {
 #if DEBUG
         } catch(Exception e) {
             SLog.Fatal(e);
+            Terminate = true;
         }
 #endif
         return Time.PerGameTick;
