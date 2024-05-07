@@ -55,4 +55,5 @@ public class DbLoginInfo
     public string HashedPassword { get; set; } = "";
     public string Salt { get; set; } = "";
     public void Flush() => db.HashSet("logins", Email.ToUpperInvariant(), JsonSerializer.Serialize(this, SourceGenerationContext.Default.DbLoginInfo));
+    public async Task FlushAsync() => await db.HashSetAsync("logins", Email.ToUpperInvariant(), JsonSerializer.Serialize(this, SourceGenerationContext.Default.DbLoginInfo));
 }

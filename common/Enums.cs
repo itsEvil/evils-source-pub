@@ -1,4 +1,11 @@
 ﻿namespace common;
+public enum CreateStatus {
+    InvalidError,
+    LimitReached,
+    SkinUnavailable,
+    Locked,
+    Ok,
+}
 public enum RegisterStatus {
     InvalidError,
     NameTaken,
@@ -87,4 +94,12 @@ public enum ObjectClass {
     Equipment,
     Character,
     Projectile,
+}
+
+public enum ItemTypes {
+    Any, //any item can go in here
+    Staff,
+    Spell,
+    Robe,
+    Ring,
 }

@@ -18,6 +18,7 @@ public class CharacterModel(AccountModel acc, int charId, bool isAsync = false) 
     public int[] Stats { get => GetValue<int[]>("stats"); set => SetValue<int[]>("stats", value); }
     public bool Dead { get => GetValue<bool>("dead"); set => SetValue<bool>("dead", value); }
     public DateTime CreationTime { get => GetValue<DateTime>("createTime"); set => SetValue("createTime", value); }
+    public DateTime LastSeen { get => GetValue<DateTime>("seenTime"); set => SetValue("seenTime", value); }
     public PotionModel[] PotionStackTypes { get => GetValue<PotionModel[]>("potions"); set => SetValue<PotionModel[]>("potions", value); }
     public ItemModel[] Inventory { get => GetValue<ItemModel[]>("inventory", []); set => SetValue<ItemModel[]>("inventory", value); }
 }

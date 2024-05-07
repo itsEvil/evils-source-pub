@@ -28,12 +28,15 @@ public class RedisDb {
 
         SLog.Info("Connected to Redis DB");
     }
-    public async Task<RegisterStatus> RegisterAsync(string email, string password, string username) {
+    public async Task<RegisterStatus> RegisterAsync(string email, string password, string username, string ip = "unknown_endpoint") {
         if (password.Length < 10)
             return RegisterStatus.InvalidPassword;
 
         if (!Utils.IsValidEmail(email))
             return RegisterStatus.InvalidEmail;
+
+        if (username.Length > 12)
+            return RegisterStatus.InvalidName;
 
         var emailUpper = email.ToUpperInvariant();
         if (!await Database.HashSetAsync("logins", emailUpper, "{}", When.NotExists)) {
@@ -41,7 +44,7 @@ public class RedisDb {
         }
 
         using var removeLogin = new DeferAction(() => {
-            SLog.Debug("Removed::Email::{0}", emailUpper);
+            //SLog.Debug("Removed::Email::{0}", emailUpper);
             Database.HashDelete("logins", emailUpper);
         });
 
@@ -51,7 +54,7 @@ public class RedisDb {
         }
 
         using var removeName = new DeferAction(() => {
-            SLog.Debug("Removed::Named::{0}", usernameUpper);
+            //SLog.Debug("Removed::Named::{0}", usernameUpper);
             Database.HashDelete("names", usernameUpper);
         });
 
@@ -62,12 +65,15 @@ public class RedisDb {
             Rank = 0,
             NextCharId = 0,
             RegTime = DateTime.Now,
-            
+            MaximumCharSlots = 2,
+            IP = ip,
+            Gifts = [],
+            Banned = false,
         };
 
         await account.FlushAsync();
         using var removeAccount = new DeferAction(() => {
-            SLog.Debug("Removed::Account::{0}", accId);
+            //SLog.Debug("Removed::Account::{0}", accId);
             Database.KeyDelete($"account.{accId}");
             Database.StringDecrement("nextAccountId");
         });
@@ -85,11 +91,53 @@ public class RedisDb {
         info.HashedPassword = hash;
         info.Salt = salt;
         info.AccountId = accId;
-        info.Flush();
+        await info.FlushAsync();
 
         removeLogin.Cancel = true;
         removeName.Cancel = true;
         removeAccount.Cancel = true;
         return RegisterStatus.Ok;
+    }
+
+    public async Task<(CreateStatus, CharacterModel?)> CreateCharacterAsync(AccountModel account, int objectType, int skinType) {
+        if(await Database.SetLengthAsync("alive." + account.Id) >= account.MaximumCharSlots) {
+            return (CreateStatus.LimitReached, null);
+        }
+
+        //todo setup skins and check here if player has skin
+        if(skinType != 0) {
+
+        }
+
+        if(!Resources.IdToObjectDesc.TryGetValue(objectType, out var objectDesc)) {
+            SLog.Warn("RedisDb::Can't find object desc with id: {0}", objectType);
+            return (CreateStatus.InvalidError, null);
+        }
+
+        if (!Resources.IdToPlayerDesc.TryGetValue(objectType, out var playerDesc)) {
+            SLog.Warn("RedisDb::Can't find player desc with id: {0}", objectType);
+            return (CreateStatus.InvalidError, null);
+        }
+
+        var newId = (int)await Database.HashIncrementAsync(account.Key, "nextCharId");
+
+        var charModel = new CharacterModel(account, newId) {
+            ObjectType = objectType,
+            Level = 1,
+            Experience = 0,
+            Fame = 0,
+            CreationTime = DateTime.Now,
+            Dead = false,
+            Skin = skinType <= 0 ? 0 : skinType,
+            Inventory = [.. playerDesc.StartingItems],
+            Stats = [.. playerDesc.GetStartStats()],
+            PotionStackTypes = [.. playerDesc.StartingPotions],
+            LastSeen = DateTime.Now,
+        };
+
+        await charModel.FlushAsync();
+        await Database.SetAddAsync("alive." + account.Id, BitConverter.GetBytes(newId));
+
+        return (CreateStatus.Ok, charModel);
     }
 }

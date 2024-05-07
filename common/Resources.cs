@@ -69,6 +69,9 @@ public static class Resources {
                 NameToGroundDesc[groundName] = IdToGroundDesc[groundType] = new GroundDesc(ground, groundType, groundName);
             }
         }
+        //Pre-load all equipment so we can cut down on some minor processing
+        foreach (var (_, player) in IdToPlayerDesc)
+            player.CreateInventory(player.Equipment);
 
         //Temp
         var nexus = new WorldDesc(WorldTypes.Nexus, "Nexus");

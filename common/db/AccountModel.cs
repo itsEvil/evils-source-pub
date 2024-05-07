@@ -29,6 +29,7 @@ public class AccountModel : RedisObject {
     public string Name { get => GetValue<string>("name"); set => SetValue<string>("name", value); }
     public string Email { get => GetValue<string>("email"); set => SetValue<string>("email", value); }
     public int NextCharId { get => GetValue<int>("nextCharId", 0); set => SetValue<int>("nextCharId", value); }
+    public int MaximumCharSlots { get => GetValue<int>("maxCharSlots", 2); set => SetValue<int>("nextCharId", value); }
     public int BanLiftTime { get => GetValue<int>("banLiftTime"); set => SetValue<int>("banLiftTime", value); }
     public bool Banned { get => GetValue<bool>("banned"); set => SetValue<bool>("banned", value); }
     public Ranks Rank { get => (Ranks)GetValue<int>("rank", 0); set => SetValue<int>("rank", (int)value); }

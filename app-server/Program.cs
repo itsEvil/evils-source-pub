@@ -66,14 +66,15 @@ public class Program {
             return Results.Ok();
         });
 
-        accGroup.MapPost("/register", async (Register register) =>
+        accGroup.MapPost("/register", async (HttpContext context, Register register) =>
         { 
             if(string.IsNullOrEmpty(register.Email) || string.IsNullOrEmpty(register.Password) || string.IsNullOrEmpty(register.Username)) {
                 return Results.BadRequest();
             }
-
-            SLog.Debug("{0}", register.ToString());
-            var result = await Redis.RegisterAsync(register.Email, register.Password, register.Username);
+            
+            var ip = context.Request.GetIp();
+            SLog.Debug("{0}:{1}", register.ToString(), ip);
+            var result = await Redis.RegisterAsync(register.Email, register.Password, register.Username, ip);
             SLog.Debug("{0}", result);
 
             return result switch {

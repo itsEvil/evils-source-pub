@@ -88,21 +88,17 @@ public readonly struct Hello : IInPacket {
         client.Enqueue(new HelloAck());
     }
 }
-public readonly struct Login : IInPacket {
+public readonly struct Login : IInPacket { //Character creation is only done via app server
     public byte Id => (byte)InPacket.Login;
     public readonly string Email;
     public readonly string Password;
-    public readonly bool NewCharacter;
     public readonly int WorldId;
-    public readonly int CharacterId; //Or ClassType if NewCharacter is True
-    public readonly int SkinType; //client sends 0
+    public readonly int CharacterId;
     public Login(Span<byte> buffer, ref int ptr, int len) {
         Email = PacketUtils.ReadString(buffer, ref ptr, len);
         Password = PacketUtils.ReadString(buffer, ref ptr, len);
-        NewCharacter = PacketUtils.ReadBool(buffer, ref ptr, len);
         WorldId = PacketUtils.ReadInt(buffer, ref ptr, len);
         CharacterId = PacketUtils.ReadInt(buffer, ref ptr, len);
-        SkinType = PacketUtils.ReadInt(buffer, ref ptr, len);
     }
     public void Handle(Client client) {
         //Try login

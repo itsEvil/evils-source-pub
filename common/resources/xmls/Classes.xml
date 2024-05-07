@@ -10,8 +10,8 @@
 		<DeathSound>player/wizard_death</DeathSound>
 		<Player />
 		<BloodProb>1.0</BloodProb>
-		<SlotTypes>2, 13, 6, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0</SlotTypes>
-		<Equipment>0x2000, 0x2001, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1</Equipment>
+		<SlotTypes>1, 2, 3, 4</SlotTypes>
+		<Equipment>0x2000, 0x2001</Equipment>
 		<MaxHitPoints max="670">100</MaxHitPoints>
 		<MaxMagicPoints max="385">100</MaxMagicPoints>
 		<Attack max="70">12</Attack>
@@ -28,5 +28,9 @@
 		<LevelIncrease min="1" max="2">Dexterity</LevelIncrease>
 		<LevelIncrease min="0" max="1">HpRegen</LevelIncrease>
 		<LevelIncrease min="0" max="2">MpRegen</LevelIncrease>
+		<Potions> <!-- Todo use actual potion types -->
+			<Potion type="0x1000" count="1"/>
+			<Potion type="0x1001" count="1"/>
+		</Potions>
 	</Object>
 </Objects>
