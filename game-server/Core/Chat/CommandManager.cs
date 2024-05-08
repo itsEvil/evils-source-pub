@@ -22,7 +22,7 @@ public static class CommandManager
         }
         var inputCommand = words[0];
 
-        if(!Commands.TryGetValue(inputCommand, out ICommand icommand)) {
+        if(!Commands.TryGetValue(inputCommand, out ICommand? icommand)) {
             player.SendError("Unknown Command");
             return;
         }
