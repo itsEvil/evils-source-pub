@@ -14,6 +14,7 @@ public sealed partial class Player(int id, int objectType) : Entity(id, objectTy
 
     public int MP = 0;
     public int MaxMP = 0;
+    public Ranks Rank = Ranks.None;
     public void Init(Client client) {
         Client = client;
 
@@ -22,6 +23,7 @@ public sealed partial class Player(int id, int objectType) : Entity(id, objectTy
         }
         if(Client.Account is not null) {
             Name = Client.Account.Name;
+            Rank = Client.Account.Rank;
         }
 
 
