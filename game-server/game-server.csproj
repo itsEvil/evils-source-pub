@@ -7,6 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <BaseOutputPath>..\bin</BaseOutputPath>
+    <StartupObject></StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,10 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Utils\" />
     <Folder Include="Core\Logic\Behaviours\" />
-    <Folder Include="Core\Logic\Database\" />
-    <Folder Include="Core\Logic\Loot\" />
+    <Folder Include="Utils\" />
   </ItemGroup>
 
 </Project>

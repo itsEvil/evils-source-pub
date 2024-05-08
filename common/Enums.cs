@@ -1,4 +1,8 @@
 ﻿namespace common;
+public enum LoginStatus {
+    Failed,
+    Ok,
+}
 public enum CreateStatus {
     InvalidError,
     LimitReached,

@@ -31,9 +31,14 @@ public class AccountModel : RedisObject {
     public int NextCharId { get => GetValue<int>("nextCharId", 0); set => SetValue<int>("nextCharId", value); }
     public int MaximumCharSlots { get => GetValue<int>("maxCharSlots", 2); set => SetValue<int>("nextCharId", value); }
     public int BanLiftTime { get => GetValue<int>("banLiftTime"); set => SetValue<int>("banLiftTime", value); }
+    public int Credits { get => GetValue<int>("banLiftTime"); set => SetValue<int>("banLiftTime", value); }
+    public int NextCharSlotPrice { get => GetValue<int>("charSlotPrice"); set => SetValue<int>("charSlotPrice", value); }
+    public int NextCharSlotCurrency { get => GetValue<int>("charSlotCurrency"); set => SetValue<int>("charSlotCurrency", value); }
     public bool Banned { get => GetValue<bool>("banned"); set => SetValue<bool>("banned", value); }
+    public bool IsGuest { get => GetValue<bool>("guest"); set => SetValue<bool>("guest", value); }
     public Ranks Rank { get => (Ranks)GetValue<int>("rank", 0); set => SetValue<int>("rank", (int)value); }
     public DateTime RegTime { get => GetValue<DateTime>("regTime"); set => SetValue("regTime", value); }
     public string IP { get => GetValue<string>("ip"); set => SetValue("ip", value); }
+    public int[] Skins { get => GetValue<int[]>("skins", []); set => SetValue("skins", value); }
     public ItemModel[] Gifts { get => GetValue<ItemModel[]>("gifts", []); set => SetValue("gifts", value); }
 }

@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gui", "gui\gui.csproj", "{1
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "game-server", "game-server\game-server.csproj", "{9A6646E9-9B5E-4F9D-B432-E81D15CAC0BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "common", "common\common.csproj", "{5650D2AB-64FE-4E1F-8BBD-459E524D7541}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "common", "common\common.csproj", "{5650D2AB-64FE-4E1F-8BBD-459E524D7541}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "app-server", "app-server\app-server.csproj", "{63F7DC85-6187-4F66-AC57-57CEFA067FC4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "app-server", "app-server\app-server.csproj", "{63F7DC85-6187-4F66-AC57-57CEFA067FC4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

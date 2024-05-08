@@ -16,6 +16,7 @@ public class RedisDb {
     public readonly IDatabase Database;
     public readonly IServer Server;
     public readonly ISubscriber Sub;
+    public readonly static string[] GuestNames = ["Guest"];
     public RedisDb(string host = "127.0.0.1", int port = 6379, int index = 0, string auth = "") {
         var conString = host + ":" + port + ",syncTimeout=60000";
         if (!string.IsNullOrWhiteSpace(auth))
@@ -139,5 +140,43 @@ public class RedisDb {
         await Database.SetAddAsync("alive." + account.Id, BitConverter.GetBytes(newId));
 
         return (CreateStatus.Ok, charModel);
+    }
+    public async Task<(LoginStatus, AccountModel?)> VerifyAsync(string email, string password) {
+        var info = await DbLoginInfo.TryGetDbLoginInfoAsync(Database, email);
+        if (info is null)
+            return (LoginStatus.Failed, null);
+
+        var userPass = (password + info.Salt).ToSHA256();
+        if(Convert.ToBase64String(userPass) != info.HashedPassword)
+            return (LoginStatus.Failed, null);
+
+        var account = new AccountModel(Database, info.AccountId);
+
+        //todo give account all class unlocks, copied from rotf:r temporarily
+        //var stats = new DbClassStats(acc);
+        //
+        //if (_resources.Settings.NewAccounts.ClassesUnlocked)
+        //    foreach (var @class in _resources.GameData.Classes.Keys)
+        //        stats.Unlock(@class);
+        //
+        //stats.FlushAsync();
+
+        // make sure account has all skins if they are supposed to
+        //if (_resources.Settings.NewAccounts.SkinsUnlocked)
+        //    acc.Skins = (from skin in _resources.GameData.Skins.Values select skin.Type).ToArray();
+
+        return (LoginStatus.Ok, account);
+    }
+    //Not really async but whatever
+    public Task<AccountModel> CreateGuestAccountAsync(string email) {
+        var acc = new AccountModel(Database, 0) {
+            Email = email,
+            Name = GuestNames[(uint)email.GetHashCode() % GuestNames.Length],
+            Rank = 0,
+            Gifts = [],
+            IsGuest = true,
+        };
+
+        return Task.FromResult(acc);
     }
 }

@@ -37,33 +37,82 @@ public class Program {
         //Servers.Add(new ServerInfo("Localhost-2", "127.0.0.1", 2052));
         
         app.Use((context, next) => {
-            SLog.Debug("Request::{0}", context.Request.Path);
+            SLog.Debug("Request::{0}::From::{1}", context.Request.Path, context.Request.GetIp());
             return next(context);
         });
 
         MapAppGroup(app);
         MapAccountGroup(app);
         MapCharacterGroup(app);
+        MapClientError(app);
 
         SLog.Info("Listening at {0}", url);
         app.Run();
     }
 
+    private static void MapClientError(WebApplication app)
+    {
+        var errorGroup = app.MapGroup("/clientError");
+        errorGroup.MapPost("/add", (HttpContext context) => {
+            SLog.Debug("ClientError::{0}", string.Join(',', context.Request.Form.Keys));
+            SLog.Debug("ClientError::{0}::{1}", context.Request.Form["text"], context.Request.Form["guid"]);
+        });
+    }
+
     private static void MapCharacterGroup(WebApplication app) {
         var charGroup = app.MapGroup("/char");
-        
+        charGroup.MapPost("/list", async (HttpContext context) => {
+            SLog.Info("CharListRequest::{0}", string.Join(',', context.Request.Form.Keys));
+            var form = context.Request.Form;
+
+            if(!form.TryGetValue("email", out var emailPrim) || !form.TryGetValue("password", out var passwordPrim)) {
+                var guest = await Redis.CreateGuestAccountAsync("guest@email.com");
+                return Results.Ok(new CharListResponse(guest.Id, guest.Name, (int)guest.Rank, guest.Credits, guest.NextCharSlotCurrency, guest.NextCharSlotCurrency, guest.Skins));
+            }
+
+            var email = emailPrim.ToString();
+            var password = passwordPrim.ToString();
+
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password)) {
+                var guest = await Redis.CreateGuestAccountAsync("guest@email.com");
+                return Results.Ok(new CharListResponse(guest.Id, guest.Name, (int)guest.Rank, guest.Credits, guest.NextCharSlotCurrency, guest.NextCharSlotCurrency, guest.Skins));
+            }
+
+            (LoginStatus, AccountModel?) results = await Redis.VerifyAsync(email, password);
+            if (results.Item1 == LoginStatus.Failed) {
+                var guest = await Redis.CreateGuestAccountAsync("guest@email.com");
+                return Results.Ok(new CharListResponse(guest.Id, guest.Name, (int)guest.Rank, guest.Credits, guest.NextCharSlotCurrency, guest.NextCharSlotCurrency, guest.Skins));
+            }
+            var acc = results.Item2;
+            if(acc is null) {
+                var guest = await Redis.CreateGuestAccountAsync("guest@email.com");
+                return Results.Ok(new CharListResponse(guest.Id, guest.Name, (int)guest.Rank, guest.Credits, guest.NextCharSlotCurrency, guest.NextCharSlotCurrency, guest.Skins));
+            }
+            
+            return Results.Ok(new CharListResponse(acc.Id, acc.Name, (int)acc.Rank, acc.Credits, acc.NextCharSlotPrice, acc.NextCharSlotCurrency, acc.Skins));
+        });
+
     }
 
     private static void MapAccountGroup(WebApplication app) {
 
         var accGroup = app.MapGroup("/account");
-        accGroup.MapPost("/verify", (Verify verify) => {
+        accGroup.MapPost("/verify", async (Verify verify) => {
             if (string.IsNullOrEmpty(verify.Email) || string.IsNullOrEmpty(verify.Password)) {
                 return Results.BadRequest();
             }
 
+            (LoginStatus, AccountModel?) results = await Redis.VerifyAsync(verify.Email, verify.Password);
+            if (results.Item1 == LoginStatus.Failed)
+                return Results.Ok("BadLogin");
+
+            var acc = results.Item2;
+            if (acc is null) {
+                SLog.Warn("LoginStatus::{0}::ButAccountIsNull::Email::{1}", results.Item1, verify.Email);
+                return Results.Ok("BadLogin");
+            }
             //todo return Account.ToJson();
-            return Results.Ok();
+            return Results.Ok(new VerifyResponse(acc.Id, acc.Name, (int)acc.Rank, acc.Credits, acc.NextCharSlotPrice, acc.NextCharSlotCurrency, acc.Skins));
         });
 
         accGroup.MapPost("/register", async (HttpContext context, Register register) =>
@@ -103,6 +152,8 @@ public class Program {
     }
 }
 
+[JsonSerializable(typeof(CharListResponse))]
+[JsonSerializable(typeof(VerifyResponse))]
 [JsonSerializable(typeof(Verify))]
 [JsonSerializable(typeof(Register))]
 [JsonSerializable(typeof(HashSet<ServerInfo>))]
@@ -125,6 +176,37 @@ public class Verify(string email, string password) {
     public string Password { get; set; } = password;
     public override string ToString() {
         return $"Verify:[{Email}|{Password}]";
+    }
+}
+public class CharListResponse(int accId, string name, int rank, int credits, int nextCharSlotPrice, int nextCharSlotCurrency, int[] skins, string menuMusic = "none", string deadMusic = "none")
+{
+    public int AccountId { get; set; } = accId;
+    public string Name { get; set; } = name;
+    public int Rank { get; set; } = rank;
+    public int Credits { get; set; } = credits;
+    public int NextCharSlotPrice { get; set; } = nextCharSlotPrice;
+    public int NextCharSlotCurrency { get; set; } = nextCharSlotCurrency;
+    public string MenuMusic { get; set; } = menuMusic;
+    public string DeadMusic { get; set; } = deadMusic;
+    public int[] Skins { get; set; } = skins;
+    public override string ToString()
+    {
+        return $"VerifyResponse:[{AccountId}|{Name}]";
+    }
+}
+
+public class VerifyResponse(int accId, string name, int rank, int credits, int nextCharSlotPrice, int nextCharSlotCurrency, int[] skins, string menuMusic = "none", string deadMusic = "none" ) {
+    public int AccountId { get; set; } = accId;
+    public string Name { get; set; } = name;
+    public int Rank { get; set; } = rank;
+    public int Credits { get; set; } = credits;
+    public int NextCharSlotPrice { get; set; } = nextCharSlotPrice;
+    public int NextCharSlotCurrency { get; set; } = nextCharSlotCurrency;
+    public string MenuMusic { get; set; } = menuMusic;
+    public string DeadMusic { get; set; } = deadMusic;
+    public int[] Skins { get; set; } = skins;
+    public override string ToString() {
+        return $"VerifyResponse:[{AccountId}|{Name}]";
     }
 }
 

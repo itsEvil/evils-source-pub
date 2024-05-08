@@ -1,4 +1,5 @@
 ﻿using common;
+using game_server.Core.Logic;
 using game_server.Networking;
 using System.Numerics;
 
@@ -8,20 +9,40 @@ public enum EntityTypes {
     Container,
     Player,
 }
-public class Entity(int id, int objectType) {
+public class Entity {
     public World? Owner = null;
     private static int NextEntityId = 1;
-    public readonly int Id = id;
-    public readonly int ObjectType = objectType;
+    public readonly int Id;
+    public readonly int ObjectType;
     public string Name = "NotSet";
 
-    public readonly Dictionary<StatType, object> Stats = [];
+    public readonly Dictionary<StatType, object> Stats = []; //export stats
     public int HP = 0;
     public int MaxHP = 0;
     public Vector2 Position { get; protected set; }
+
+    public Dictionary<int, int>? StateCooldown = [];
+    public Dictionary<int, object>? StateObject = []; //Used for things like WanderStates etc.
+    public readonly BehaviorModel? Behaviours;
+    public State? CurrentState;
+    public State? StateEntryCommonRoot;
+    public bool StateEntry = true;
+    public Entity(int id, int objectType) {
+        Id = id;
+        ObjectType = objectType;
+        Behaviours = BehaviorDb.Resolve(objectType);
+    }
     public virtual Task Tick() {
-        SLog.Debug("Entity::{0}::Hp::{1}::MaxHp::{2}", Name, HP, MaxHP);
+        //SLog.Debug("Entity::{0}::Hp::{1}::MaxHp::{2}", Name, HP, MaxHP);
         Export();
+
+        //Change to distance check when I add chunks
+        try {
+            CurrentState?.Tick(this);
+        } catch (Exception e) {
+            SLog.Error(e);
+        }
+
         return Task.CompletedTask;
     }
     public virtual void Export() {
@@ -39,17 +60,28 @@ public class Entity(int id, int objectType) {
         Name = desc.Name;
         HP = desc.MaximumHp;
         MaxHP = desc.MaximumHp;
+        
+        if (Behaviours is not null) {
+            CurrentState = Behaviours.Root;
+            CurrentState?.Enter(this);
+        }
     }
     public virtual void LeaveWorld() {
-        //Not disposed yet, enqueue particles to play or something here
+
     }
     public virtual void Dispose() {
         Owner = null;
         Stats.Clear();
+        StateCooldown?.Clear();
+        StateObject?.Clear();
+
+        StateCooldown = null;
+        StateObject = null;
     }
 
     public virtual void Death(string killer = "") {
         SLog.Debug("KilledBy::{0}", killer);
+        CurrentState?.Death(this);
         Owner?.LeaveWorld(this);
     }
     public bool HitByProjectile(Projectile proj) {

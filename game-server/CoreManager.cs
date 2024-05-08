@@ -16,7 +16,8 @@ public sealed partial class CoreManager {
         Resources.InitXmls(Path.Combine("resources", "xmls"));
         _ = Task.Factory.StartNew(AcceptConnections);
         _ = Task.Factory.StartNew(NetworkTick);
-        
+
+        BehaviourDb = new();
         GetWorld(World.NexusId, Resources.NameToWorldDesc["Nexus"]);
     }
     public async Task<int> Run() {
