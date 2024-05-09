@@ -10,7 +10,10 @@ public enum EntityTypes {
     Player,
 }
 public class Entity {
+    public Chunk? CurrentChunk;
     public World? Owner = null;
+    public int UpdateCount;
+
     private static int NextEntityId = 1;
     public readonly int Id;
     public readonly int ObjectType;
@@ -19,7 +22,8 @@ public class Entity {
     public readonly Dictionary<StatType, object> Stats = []; //export stats
     public int HP = 0;
     public int MaxHP = 0;
-    public Vector2 Position { get; protected set; }
+    public Vector2 Position { get; set; }
+    public Vector2 Start { get; set; }
 
     public Dictionary<int, int>? StateCooldown = [];
     public Dictionary<int, object>? StateObject = []; //Used for things like WanderStates etc.
@@ -33,6 +37,7 @@ public class Entity {
         Behaviours = BehaviorDb.Resolve(objectType);
     }
     public virtual Task Tick() {
+        
         //SLog.Debug("Entity::{0}::Hp::{1}::MaxHp::{2}", Name, HP, MaxHP);
         Export();
 
@@ -49,22 +54,28 @@ public class Entity {
         Stats[StatType.Hp] = HP;
         Stats[StatType.MaxHp] = MaxHP;
     }
-    public virtual void EnterWorld(World world, Vector2 position) {
-        if(!Resources.IdToObjectDesc.TryGetValue(ObjectType, out ObjectDesc? desc)) {
+    //Called before going into the tick loop
+    //Return false if init fails!
+    public virtual bool Init() {
+        if (!Resources.IdToObjectDesc.TryGetValue(ObjectType, out ObjectDesc? desc)) {
             SLog.Debug("ObjectType::{0}::NotFoundInResources::UsingPirate", ObjectType);
-            desc = Resources.NameToObjectDesc["Pirate"];
+            return false;
         }
 
-        Owner = world;
-        Position = position;
         Name = desc.Name;
         HP = desc.MaximumHp;
         MaxHP = desc.MaximumHp;
-        
+
         if (Behaviours is not null) {
             CurrentState = Behaviours.Root;
-            CurrentState?.Enter(this);
         }
+
+        return true;
+    }
+    public virtual void EnterWorld(World world, Vector2 position) {
+        Owner = world;
+        Position = position;
+        CurrentState?.Enter(this);
     }
     public virtual void LeaveWorld() {
 
@@ -75,6 +86,8 @@ public class Entity {
         StateCooldown?.Clear();
         StateObject?.Clear();
 
+        CurrentState = null;
+        CurrentChunk = null;
         StateCooldown = null;
         StateObject = null;
     }

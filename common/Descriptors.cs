@@ -12,6 +12,8 @@ namespace common;
 public class WorldDesc(WorldTypes worldType, string worldName) {
     public readonly WorldTypes WorldType = worldType;
     public readonly string WorldName = worldName;
+    public readonly int Width = 50;
+    public readonly int Height = 50;
 }
 
 public class ObjectDesc {

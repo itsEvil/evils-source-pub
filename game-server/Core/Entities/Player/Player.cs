@@ -44,4 +44,10 @@ public sealed partial class Player(int id, int objectType) : Entity(id, objectTy
         Client.Character.Inventory = Inventory;
         Client.Character.FlushAsync();
     }
+    public override Task Tick() {
+
+
+        SendNewTick();
+        return base.Tick();
+    }
 }

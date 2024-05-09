@@ -1,6 +1,6 @@
 ﻿using game_server.Core.Logic.Transitions;
 
-namespace game_server.Core.Logic;
+namespace game_server.Core.Logic.Database;
 
 //Note
 //
