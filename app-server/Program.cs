@@ -62,18 +62,7 @@ public class Program {
 
     private static void MapCharacterGroup(WebApplication app) {
         var charGroup = app.MapGroup("/char").DisableAntiforgery();
-        charGroup.MapPost("/list", async (HttpContext context) => {
-            SLog.Info("CharListRequest::{0}", string.Join(',', context.Request.Form.Keys));
-            var form = context.Request.Form;
-
-            if(!form.TryGetValue("email", out var emailPrim) || !form.TryGetValue("password", out var passwordPrim)) {
-                var guest = await Redis.CreateGuestAccountAsync("guest@email.com");
-                return Results.Ok(new CharListResponse(guest.Id, guest.Name, (int)guest.Rank, guest.Credits, guest.NextCharSlotCurrency, guest.NextCharSlotCurrency, guest.Skins));
-            }
-
-            var email = emailPrim.ToString();
-            var password = passwordPrim.ToString();
-
+        charGroup.MapPost("/list", async (HttpContext context, [FromForm] string email, [FromForm] string password) => {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password)) {
                 var guest = await Redis.CreateGuestAccountAsync("guest@email.com");
                 return Results.Ok(new CharListResponse(guest.Id, guest.Name, (int)guest.Rank, guest.Credits, guest.NextCharSlotCurrency, guest.NextCharSlotCurrency, guest.Skins));
