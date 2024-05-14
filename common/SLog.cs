@@ -107,6 +107,9 @@ public static class SLog
     private static string Format(string message, params object[] args)
     {
         return string.Format($"{DateTime.Now:HH:mm:ss} | {message}", args);
+        //If you get this error 'Index (zero based) must be greater than or equal to zero and less than the size of the argument list.'
+        //Then you forgot to add a indexes for your arguments or have too many argmuents. Arguments indexes being these '{0}' '{1}' etc.
+        //SLog.Debug("Some Message: {0}", argumentOne);
     }
     //This resets the console colors and adds a new line for the next message
     private static void Reset()

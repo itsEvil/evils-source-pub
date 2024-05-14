@@ -1,5 +1,6 @@
 using common;
 using common.db;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
 
 namespace app_server;
@@ -19,7 +20,6 @@ public class Program {
             options.SerializerOptions.TypeInfoResolverChain.Insert(1, SourceGenerationContext.Default);
         });
 
-
         var app = builder.Build();
 
         //todo add config
@@ -35,8 +35,8 @@ public class Program {
         //To test Json
         //Servers.Add(new ServerInfo("Localhost-1", "127.0.0.1", 2051));
         //Servers.Add(new ServerInfo("Localhost-2", "127.0.0.1", 2052));
-        
-        app.Use((context, next) => {
+        app.Use((context, next) =>
+        {
             SLog.Debug("Request::{0}::From::{1}", context.Request.Path, context.Request.GetIp());
             return next(context);
         });
@@ -52,7 +52,8 @@ public class Program {
 
     private static void MapClientError(WebApplication app)
     {
-        var errorGroup = app.MapGroup("/clientError");
+        //Probably want to use Antiforgery but meh
+        var errorGroup = app.MapGroup("/clientError").DisableAntiforgery();
         errorGroup.MapPost("/add", (HttpContext context) => {
             SLog.Debug("ClientError::{0}", string.Join(',', context.Request.Form.Keys));
             SLog.Debug("ClientError::{0}::{1}", context.Request.Form["text"], context.Request.Form["guid"]);
@@ -60,7 +61,7 @@ public class Program {
     }
 
     private static void MapCharacterGroup(WebApplication app) {
-        var charGroup = app.MapGroup("/char");
+        var charGroup = app.MapGroup("/char").DisableAntiforgery();
         charGroup.MapPost("/list", async (HttpContext context) => {
             SLog.Info("CharListRequest::{0}", string.Join(',', context.Request.Form.Keys));
             var form = context.Request.Form;
@@ -96,7 +97,7 @@ public class Program {
 
     private static void MapAccountGroup(WebApplication app) {
 
-        var accGroup = app.MapGroup("/account");
+        var accGroup = app.MapGroup("/account").DisableAntiforgery();
         accGroup.MapPost("/verify", async (Verify verify) => {
             if (string.IsNullOrEmpty(verify.Email) || string.IsNullOrEmpty(verify.Password)) {
                 return Results.BadRequest();
@@ -115,16 +116,17 @@ public class Program {
             return Results.Ok(new VerifyResponse(acc.Id, acc.Name, (int)acc.Rank, acc.Credits, acc.NextCharSlotPrice, acc.NextCharSlotCurrency, acc.Skins));
         });
 
-        accGroup.MapPost("/register", async (HttpContext context, Register register) =>
-        { 
-            if(string.IsNullOrEmpty(register.Email) || string.IsNullOrEmpty(register.Password) || string.IsNullOrEmpty(register.Username)) {
+        accGroup.MapPost("/register", async (HttpContext context,[FromForm] string email, [FromForm] string password, [FromForm] string username) =>
+        {
+            SLog.Debug("Register:{0}", email);
+            if(string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(username)) {
                 return Results.BadRequest();
             }
             
             var ip = context.Request.GetIp();
-            SLog.Debug("{0}:{1}", register.ToString(), ip);
-            var result = await Redis.RegisterAsync(register.Email, register.Password, register.Username, ip);
-            SLog.Debug("{0}", result);
+            SLog.Debug("ip:{0}", ip);
+            var result = await Redis.RegisterAsync(email, password, username, ip);
+            SLog.Debug("result:{0}", result);
 
             return result switch {
                 RegisterStatus.InvalidError => Results.Ok("Invalid Error"),
