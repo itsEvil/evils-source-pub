@@ -98,18 +98,18 @@ public class Program {
     private static void MapAccountGroup(WebApplication app) {
 
         var accGroup = app.MapGroup("/account").DisableAntiforgery();
-        accGroup.MapPost("/verify", async (Verify verify) => {
-            if (string.IsNullOrEmpty(verify.Email) || string.IsNullOrEmpty(verify.Password)) {
-                return Results.BadRequest();
+        accGroup.MapPost("/verify", async ([FromForm] string email, [FromForm] string password) => {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password)) {
+                return Results.BadRequest("Invalid Form Data");
             }
 
-            (LoginStatus, AccountModel?) results = await Redis.VerifyAsync(verify.Email, verify.Password);
+            (LoginStatus, AccountModel?) results = await Redis.VerifyAsync(email, password);
             if (results.Item1 == LoginStatus.Failed)
                 return Results.Ok("BadLogin");
 
             var acc = results.Item2;
             if (acc is null) {
-                SLog.Warn("LoginStatus::{0}::ButAccountIsNull::Email::{1}", results.Item1, verify.Email);
+                SLog.Warn("LoginStatus::{0}::ButAccountIsNull::Email::{1}", results.Item1, email);
                 return Results.Ok("BadLogin");
             }
             //todo return Account.ToJson();
@@ -120,7 +120,7 @@ public class Program {
         {
             SLog.Debug("Register:{0}", email);
             if(string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(username)) {
-                return Results.BadRequest();
+                return Results.BadRequest("Invalid Form Data");
             }
             
             var ip = context.Request.GetIp();
