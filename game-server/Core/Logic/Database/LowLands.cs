@@ -8,8 +8,8 @@ namespace game_server.Core.Logic.Database;
 
 //Note
 //
-//These IBehaviourDatabase classes do not
-//automtically get added as I don't want to use reflection
+//These IBehaviourDatabase classes are not
+//automtically added as I don't want to use reflection
 
 //Check at the top of Behavior.cs if you want to add new IBehaviourDatabase classes
 public sealed class LowLands : IBehaviourDatabase {
