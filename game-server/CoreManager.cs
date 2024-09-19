@@ -7,6 +7,8 @@ using System.Diagnostics;
 
 namespace game_server;
 public sealed partial class CoreManager {
+    private readonly Stopwatch Watch = Stopwatch.StartNew();
+
     public static readonly RedisDb Redis = new();
     public static readonly Stopwatch Timer = Stopwatch.StartNew(); //Time since application start
     public ConcurrentDictionary<int, Client> Clients = [];
@@ -20,12 +22,12 @@ public sealed partial class CoreManager {
         BehaviourDb = new();
         GetWorld(World.NexusId, Resources.NameToWorldDesc["Nexus"]);
     }
+
     public async Task<int> Run() {
 #if DEBUG
         try {
 #endif
-            var watch = Stopwatch.StartNew();
-            watch.Restart();
+            Watch.Restart();
             Transaction = Redis.Database.CreateTransaction();
             //SLog.Debug("Worlds::{0}::Tick::{1}::ToAdd::{2}::ToRemove::{3}", Worlds.Count, Time.GameTickCount, _toAddWorlds.Count, _toRemoveWorlds.Count);
             for (int i = 0; i < _toRemoveWorlds.Count; i++)
@@ -60,7 +62,7 @@ public sealed partial class CoreManager {
             _gameTasks.Clear();
 
             await Transaction.ExecuteAsync();
-            var elapsed = watch.Elapsed.TotalMilliseconds;
+            var elapsed = Watch.Elapsed.TotalMilliseconds;
             var sleepTime = Math.Max(0, Time.PerGameTick - (int)elapsed);
             Time.GameTickCount++;
             return sleepTime;

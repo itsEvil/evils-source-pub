@@ -87,6 +87,8 @@ public sealed partial class Client(int id, CoreManager manager) {
         int ptr = Send.PacketLength;
         
         ptr += LENGTH_PREFIX_WITH_ID;
+
+        //write id
         PacketUtils.WriteByte(buffer, packet.Id, ref ptr);
         
         var beforeWritePtr = ptr;
