@@ -365,3 +365,4 @@ redis/database__log
 redis/dump.rdb
 redis/3.2.100/dump.rdb
 redis/7.2.4/dump.rdb
+/Garnet/AOF

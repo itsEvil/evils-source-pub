@@ -1,11 +1,4 @@
-﻿using common;
-using Shared;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Shared.Redis;
 using WebServer.Core.Options;
 
 namespace WebServer.Core;
@@ -13,14 +6,21 @@ public class Application : IDisposable {
     private bool _terminate = false;
     private AppOptions _options;
     private NetHandler _handler;
+    private RedisDb _redis;
     public Application()
     {
         _handler = new();
+        _redis = new();
     }
     public void Awake(AppOptions options) {
         _options = options;
 
         _handler.Init(options);
+        _redis.Init(options.Redis.Host, options.Redis.Port, options.Redis.SyncTimeout, options.Redis.Index, options.Redis.Password);
+
+        _redis.Globals.NextAccountId += 5;
+        _redis.Globals.FlushAsync();
+
         Task.Run(_handler.AcceptConnections);
     }
     public int Run() {

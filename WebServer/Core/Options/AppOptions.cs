@@ -10,4 +10,6 @@ public class AppOptions {
     public int MaxConnections = 128;
     public int MaxConnectionsPerIp = 4;
     public int Port = 8080;
+
+    public Redis Redis = new();
 }

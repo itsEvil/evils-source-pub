@@ -1,4 +1,6 @@
-﻿namespace WebServer.Net.Packets;
+﻿using Shared;
+
+namespace WebServer.Net.Packets;
 public interface ISend
 {
     public ushort Id { get; }
