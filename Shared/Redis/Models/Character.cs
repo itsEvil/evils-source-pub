@@ -1,5 +1,7 @@
-﻿namespace Shared.Redis.Models;
-public sealed class Character : RedisObject
+﻿using Shared.Interfaces;
+
+namespace Shared.Redis.Models;
+public sealed class Character : RedisObject, IWriteable
 {
     public Account Account { get; init; }
     public uint Id = 0;

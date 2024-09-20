@@ -13,6 +13,9 @@ public sealed class Client {
 
     private readonly NetHandler _handler;
     public bool ForceDisconnect = false;
+
+    public RSA Rsa;
+
     public Client(int id, NetHandler handler) {
         _handler = handler;
         Id = id;
@@ -60,7 +63,7 @@ public sealed class Client {
             return Task.CompletedTask;
         }
 
-        Tcp.TickSend();
+        Tcp.Send();
 
         return Task.CompletedTask;
     }

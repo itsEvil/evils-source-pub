@@ -1,7 +1,8 @@
-﻿using StackExchange.Redis;
+﻿using Shared.Interfaces;
+using StackExchange.Redis;
 
 namespace Shared.Redis.Models;
-internal class Guild : RedisObject
+internal class Guild : RedisObject, IWriteable
 {
     public uint Id = 0;
     public string Name = "";

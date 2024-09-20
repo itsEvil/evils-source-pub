@@ -1,5 +1,7 @@
-﻿namespace Shared.Redis.Models;
-public sealed class ItemData {
+﻿using Shared.Interfaces;
+
+namespace Shared.Redis.Models;
+public sealed class ItemData : IWriteable {
     public uint Id = 0;
     public uint Type = 0;
     public uint Stacks = 0;

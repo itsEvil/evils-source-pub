@@ -18,6 +18,7 @@ public static class JsonCache {
 [JsonSerializable(typeof(ItemData))]
 [JsonSerializable(typeof(ItemData[]))]
 [JsonSerializable(typeof(string[]))]
+[JsonSerializable(typeof(Login))]
 public partial class SourceGenerationContext : JsonSerializerContext
 {
 

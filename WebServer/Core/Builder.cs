@@ -10,9 +10,8 @@ public sealed class Builder
         m_Options ??= new T();
         options?.Invoke((T)m_Options);
     }
-    public T Build<T>() where T : Application, new()
-    {
-        var ret = new T();
+    public Application Build() {
+        var ret = Application.Get();
         m_Options ??= new AppOptions();
         ret.Awake(m_Options);
         return ret;

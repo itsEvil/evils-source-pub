@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using WebServer.Net.Interfaces;
 using WebServer.Net.Packets;
 
 namespace WebServer.Net;
@@ -116,13 +117,6 @@ public class TcpClient {
 
         return true;
     }
-
-    //Ticked on main thread
-    public void TickSend()
-    {
-        Send();
-    }
-
     //Ticked on worker
     public void TickReceive()
     {
@@ -144,35 +138,27 @@ public class TcpClient {
 
     public void Send()
     {
-
-        if (!m_Socket.Connected)
-            return;
-
         m_Writer.Reset();
+        m_Send.Reset();
 
         int amount = 0;
         var buffer = m_Send.Data.AsSpan();
-
         while (m_SendPackets.TryDequeue(out var packet))
         {
             //Includes packet Id but not packet length
             var packetSize = Marshal.SizeOf(packet);
 #if DEBUG
-            SLog.Debug("Send: id: {0}, size: {1}", args: [packet.Id, packetSize]);
+            SLog.Debug("Send: id: {0}, size: {1}", args: [(C2S)packet.Id, packetSize]);
 #endif
 
             //Buffer is full so we should break and send our data
-            if (m_Writer.Position + packetSize + PrefixLength >= buffer.Length)
+            if (m_Writer.Position + (packetSize + PrefixLength) >= buffer.Length)
                 break;
 
             amount++;
 
-            //Write packet stuff
-            //Length
-            m_Writer.Write(buffer, (uint)(packetSize - 2));
-            //Id
+            m_Writer.Write(buffer, (uint)(packetSize - 6)); //minus 6 as we want to get rid of the entire header
             m_Writer.Write(buffer, (ushort)packet.Id);
-            //Packet data
             packet.Write(m_Writer, buffer);
         }
 
@@ -182,20 +168,23 @@ public class TcpClient {
 
 #if DEBUG
         SLog.Debug("Sending {0} packets", args: [amount]);
+
         var sb = new StringBuilder();
         sb.Append('[');
         for (int i = 0; i < m_Writer.Position; i++)
         {
-            sb.Append(buffer[i]).Append(',');
+            if (i + 1 != m_Writer.Position)
+                sb.Append(buffer[i]).Append(',');
         }
         sb.Append(']');
+
         SLog.Debug("Sent: {0}", args: [sb.ToString()]);
 #endif
 
 
         try
         {
-            m_Socket.Send(buffer[0..m_Writer.Position]);
+            m_Socket.Send(buffer[0..(m_Writer.Position + 2)]);
         } 
         catch(Exception e)
         {
@@ -221,17 +210,19 @@ public class TcpClient {
             }
         
             m_Reader.Reset(length);
-
+#if DEBUG
             var sb = new StringBuilder();
             sb.Append('[');
             for (int i = 0; i < length; i++)
             {
-                sb.Append(m_Receive.Data[i]).Append(',');
+                if(i + 1 != length)
+                    sb.Append(m_Receive.Data[i]).Append(',');
             }
             sb.Append(']');
             SLog.Debug("Received: {0}", args: [sb.ToString()]);
-
+#endif
             Read(length);
+            m_Receive.Reset();
         }
         catch(Exception e)
         {
@@ -243,29 +234,23 @@ public class TcpClient {
     {
         var buffer = m_Receive.Data.AsSpan();
 
-        while(m_Reader.Position < totalLength)
+        while(m_Reader.Position + 6 < totalLength)
         {
             uint packetLength = m_Reader.UInt(buffer);
             var packetId = m_Reader.UShort(buffer);
 
-            if(packetLength + m_Reader.Position >= totalLength) {
-                SLog.Error("Total length is smaller then packet length + position. {0}, {1}", args: [packetLength, m_Reader.Position]);
+            if(packetLength + (m_Reader.Position - 6) >= totalLength) {
+                SLog.Error("Total length is smaller then packet length + position. {0}, {1}, {2}", args: [packetLength, m_Reader.Position - 6, totalLength]);
                 return;
             }
 
-            m_ReceivePackets.Enqueue(ReadPacket(packetId, m_Reader, m_Receive.Data));
-            SLog.Debug("Receive id:{0} length:{1}", args: [packetId, packetLength]);
-            
-            //Next packet length
-        }
-    }
+            if(!PacketHandler.TryGetPacket(packetId, m_Reader, m_Receive.Data, out var packet)) {
+                SLog.Error("Failed to find packet with id {0}", args: [packetId]);
+                continue;
+            }
 
-    public static IReceive ReadPacket(ushort packetId, Reader reader, Span<byte> buffer)
-    {
-        return (C2S)packetId switch
-        {
-            C2S.Hello => new Hello(reader, buffer),
-            _ => throw new Exception("Unknown packet id...")
-        };
+            m_ReceivePackets.Enqueue(packet);
+            SLog.Debug("Receive id:{0} length:{1} total:{2}", args: [packetId, packetLength, totalLength]);
+        }
     }
 }

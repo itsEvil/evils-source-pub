@@ -4,14 +4,14 @@ using WebServer.Core.Options;
 namespace WebServer;
 public sealed class Program {
     static int Main(string[] args) {
-        var builder = Builder.Create();
+        var b = Builder.Create();
 
-        builder.AddOptions<AppOptions>((options) => { 
+        b.AddOptions<AppOptions>((options) => { 
         
         
         });
 
-        using var app = builder.Build<Application>();
+        using var app = b.Build();
 
         return app.Run();
     }
