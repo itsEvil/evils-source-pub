@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace common;
+﻿namespace Shared;
 public static class Time {
     public static int GameTickCount = 0;
     public static int NetworkTickCount = 0;

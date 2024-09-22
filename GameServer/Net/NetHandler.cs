@@ -1,11 +1,9 @@
 ﻿using System.Net.Sockets;
 using System.Net;
-using WebServer.Net;
 using System.Collections.Concurrent;
 using Shared;
-using WebServer.Core.Options;
-
-namespace WebServer.Core;
+using GameServer.Core.Options;
+namespace GameServer.Net;
 public class NetHandler
 {
     public ConcurrentDictionary<int, Client> Clients = [];
@@ -30,7 +28,8 @@ public class NetHandler
     private IPEndPoint _endPoint;
     private Socket _listener;
 
-    public void Init(AppOptions options) {
+    public void Init(AppOptions options)
+    {
         Backlog = options.Backlog;
         MaxConnections = options.MaxConnections;
         MaxConnectionsPerIp = options.MaxConnectionsPerIp;
@@ -46,7 +45,7 @@ public class NetHandler
 
         for (int i = 0; i < MaxConnections; i++)
         {
-            _clientPool.Enqueue(new Client(i,this));
+            _clientPool.Enqueue(new Client(i, this));
         }
 
         _listener.Bind(_endPoint);

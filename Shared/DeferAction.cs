@@ -1,4 +1,4 @@
-﻿namespace common;
+﻿namespace Shared;
 
 public sealed class DeferAction(Action action) : IDisposable {
     private readonly Action _action = action;

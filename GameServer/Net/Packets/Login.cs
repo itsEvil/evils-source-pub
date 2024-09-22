@@ -1,9 +1,9 @@
 ﻿using Shared;
 using Shared.Redis.Models;
-using WebServer.Core;
-using WebServer.Net.Interfaces;
+using GameServer.Net.Interfaces;
+using GameServer.Core;
 
-namespace WebServer.Net.Packets;
+namespace GameServer.Net.Packets;
 public readonly struct Login : IReceive {
     public readonly string Email;
     public readonly string Password;
@@ -22,7 +22,7 @@ public readonly struct Login : IReceive {
         }
 
         if(!redis.TryGetAccount(email, out var acc)) {
-            client.Tcp.EnqueueSend(new Failure("Account does not exist..."));
+            client.Tcp.EnqueueSend(new Failure("Account not found..."));
             return;
         }
 

@@ -1,9 +1,9 @@
-﻿using Shared;
+﻿using GameServer.Game.Objects;
+using Shared;
 using Shared.Redis.Models;
 using System.Net.Sockets;
-using WebServer.Core;
 
-namespace WebServer.Net;
+namespace GameServer.Net;
 public sealed class Client(int id, NetHandler handler)
 {
     public readonly int Id = id;
@@ -18,32 +18,42 @@ public sealed class Client(int id, NetHandler handler)
     public bool LateDisconnect = false;
     public RSA Rsa;
     public Account Account;
-    public void Begin(Socket socket) {
-        if (Tcp is not null) {
-            Tcp.Reset();
+    public Character Character;
+    public Player Player;
+    public void Begin(Socket socket)
+    {
+        if (Tcp is not null)
+        {
             Tcp.Disconnect();
             Tcp = null;
         }
+
+        Character = null;
+        Player = null;
         Rsa = null;
         Account = null;
         Tcp = new TcpClient(socket);
         LastMessageTime = DateTime.Now;
         DisconnectTime = TimeSpan.FromMilliseconds(1000);
         LateDisconnect = false;
+
         Tcp.BeginReceive();
     }
-    public Task Tick() {
-        if (Tcp is null) {
+    public Task Tick()
+    {
+        if (Tcp is null)
+        {
             Disconnect("Tcp is null");
             return Task.CompletedTask;
         }
 
-        if(DateTime.Now - LastMessageTime > DisconnectTime)
+        if (DateTime.Now - LastMessageTime > DisconnectTime)
             LateDisconnect = true;
 
         Tcp.Tick(this);
 
-        if (LateDisconnect) {
+        if (LateDisconnect)
+        {
             LateDisconnect = false;
             Disconnect("DisconnectNextTick");
         }
@@ -52,8 +62,10 @@ public sealed class Client(int id, NetHandler handler)
     }
 
     //Handled on Network Thread
-    public Task NetworkTick() {
-        if (Tcp is null || !Tcp.IsValid()) {
+    public Task NetworkTick()
+    {
+        if (Tcp is null || !Tcp.IsValid())
+        {
             Disconnect("SocketIsNullOrDisconnected");
             return Task.CompletedTask;
         }
@@ -62,8 +74,9 @@ public sealed class Client(int id, NetHandler handler)
 
         return Task.CompletedTask;
     }
-    public void Disconnect(string message) {
-        SLog.Debug("Client-Disconnect: {0}", args:[message]);
+    public void Disconnect(string message)
+    {
+        SLog.Debug("Client-Disconnect: {0}", args: [message]);
         Tcp?.Disconnect();
 
         _handler.AddBack(this);

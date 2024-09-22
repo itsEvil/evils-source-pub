@@ -1,13 +1,12 @@
-﻿using WebServer.Core;
-using WebServer.Core.Options;
-
-namespace WebServer;
-public sealed class Program {
-    static int Main(string[] args) {
+﻿using GameServer.Core;
+using GameServer.Core.Options;
+using Shared;
+namespace GameServer;
+public static class Program {
+    public static int Main(string[] args) {
         var b = Builder.Create();
 
         b.AddOptions<AppOptions>((options) => { 
-        
         
         });
 

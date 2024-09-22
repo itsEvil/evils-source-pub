@@ -10,40 +10,34 @@ public readonly struct Create(Reader r, Span<byte> b) : IReceive
     public void Handle(Client client) {
         //Not logged in!
         if(client.Account == null || client.Rsa == null) {
-            client.Tcp.EnqueueSend(new CreateAck());
+            client.Tcp.EnqueueSend(new Failure("Account is null..."));
             return;
         }
 
         if(client.Account.Alive.Length >= Account.MaxCharacterSlots) {
-            client.Tcp.EnqueueSend(new CreateAck());
+            client.Tcp.EnqueueSend(new Failure("Not enough character slots..."));
             return;
         }
 
         var app = Application.Instance;
         if(!app.Resources.Id2Player.TryGetValue(Id, out var @class)) {
-            client.Tcp.EnqueueSend(new CreateAck());
+            client.Tcp.EnqueueSend(new Failure("Player class not found..."));
             return;
         }
 
 
         var redis = app.Redis;
         var character = redis.CreateCharacter(client.Account, @class);
-        client.Tcp.EnqueueSend(new CreateAck(true, character));
+        client.Tcp.EnqueueSend(new CreateAck(character));
     }
 }
 public readonly struct CreateAck : ISend {
     public ushort Id => (byte)S2C.CreateAck;
-
-    private readonly bool IsSuccess;
     private readonly Character Character;
-    public CreateAck(bool success = false, Character character = null) {
-        IsSuccess = success;
+    public CreateAck(Character character) {
         Character = character;
     }
-
     public void Write(Writer w, Span<byte> b) {
-        w.Write(b, IsSuccess);
-        if (IsSuccess)
-            Character.Write(w, b);
+        Character.Write(w, b);
     }
 }

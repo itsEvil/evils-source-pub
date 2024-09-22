@@ -11,9 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "common", "common\common.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "app-server", "app-server\app-server.csproj", "{63F7DC85-6187-4F66-AC57-57CEFA067FC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebServer", "WebServer\WebServer.csproj", "{75282F04-356F-4838-941F-39D6A78D9053}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebServer", "WebServer\WebServer.csproj", "{75282F04-356F-4838-941F-39D6A78D9053}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{3260F0B6-0756-429E-93F1-C729E045BAEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{3260F0B6-0756-429E-93F1-C729E045BAEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameServer", "GameServer\GameServer.csproj", "{5EBD60AA-424D-4628-80E8-FA6BC69B0560}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{3260F0B6-0756-429E-93F1-C729E045BAEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3260F0B6-0756-429E-93F1-C729E045BAEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3260F0B6-0756-429E-93F1-C729E045BAEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EBD60AA-424D-4628-80E8-FA6BC69B0560}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EBD60AA-424D-4628-80E8-FA6BC69B0560}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EBD60AA-424D-4628-80E8-FA6BC69B0560}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EBD60AA-424D-4628-80E8-FA6BC69B0560}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,5 +1,4 @@
 ﻿using Shared;
-using Shared.Redis.Models;
 using WebServer.Core;
 using WebServer.Net.Interfaces;
 
@@ -21,26 +20,24 @@ public readonly struct Register : IReceive {
         SLog.Debug("Register: '{0}' '{1}' ", args: [email, password]);
 
         if (!Utils.IsValidEmail(email)) {
-            client.Tcp.EnqueueSend(new RegisterAck(false, "Invalid Email"));
+            client.Tcp.EnqueueSend(new Failure("Invalid Email"));
             return;
         }
 
         if (app.Redis.TryGetAccount(email, out _)) {
-            client.Tcp.EnqueueSend(new RegisterAck(false, "Email already in use"));
+            client.Tcp.EnqueueSend(new Failure("Email already in use"));
             return;
         }
 
         _ = app.Redis.CreateAccount(email, password);
 
-        client.Tcp.EnqueueSend(new RegisterAck(true, "Success"));
+        client.Tcp.EnqueueSend(new RegisterAck("Success"));
     }
 }
-public readonly struct RegisterAck(bool success, string message) : ISend {
+public readonly struct RegisterAck(string message) : ISend {
     public ushort Id => (ushort)S2C.RegisterAck;
-    public readonly bool IsSuccessful = success;
     public readonly string Message = message;
     public void Write(Writer w, Span<byte> b) {
-        w.Write(b, IsSuccessful);
         w.Write(b, Message);
     }
 }

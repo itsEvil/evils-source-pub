@@ -1,0 +1,98 @@
+﻿using GameServer.Game.Objects;
+using Shared;
+using System.Numerics;
+namespace GameServer.Game.Worlds;
+public class World {
+    public readonly Dictionary<uint, Entity> Entities = []; 
+    public readonly Dictionary<uint, Player> Players = [];
+
+    private readonly List<Entity> ToAddEntity = [];
+    private readonly List<uint> ToRemoveEntity = [];
+
+    private readonly List<Player> ToAddPlayer = [];
+    private readonly List<uint> ToRemovePlayer = [];
+
+    private readonly List<Task> EntityUpdates = new List<Task>(256);
+    private readonly List<Task> PlayerUpdates = new List<Task>(128);
+
+    public readonly uint Id;
+    public readonly Map Map;
+    public World(uint worldId /*, WorldDesc worldDesc */)
+    {
+        Id = worldId;
+        
+        //load map from world desc not hard coded
+        Map = new Map(1024, 1024);
+    }
+
+    public void Enter(Entity entity, Vector2 at) {
+        entity.Position = at;
+
+        switch (entity) {
+            case Player player:
+            {
+                ToAddPlayer.Add(player);
+                break;
+            }
+            default:
+            {
+                ToAddEntity.Add(entity);
+                break;
+            }
+        }
+    }
+
+    public bool ValidatePosition(Vector2 position) {
+        if (position.X < 0 || position.Y < 0 || position.X > Map.Width || position.Y > Map.Height)
+            return false;
+
+        //check if there is a wall object here
+        //if so return false as they would be no clipping
+
+        return true;
+    }
+
+    private void Add()
+    {
+        foreach (var player in ToAddPlayer)
+            Players[player.UniqueId] = player;
+
+        foreach (var entity in ToAddEntity)
+            Entities[entity.UniqueId] = entity;
+    }
+
+    private void Remove() {
+        //This might throw if it cant find a entity to remove
+        try {
+            foreach (var id in ToRemovePlayer)
+                Players.Remove(id);
+
+            foreach (var id in ToRemoveEntity)
+                Entities.Remove(id);
+        } 
+        catch(Exception e)
+        {
+            SLog.Error(e);
+        }
+    }
+
+    public async Task Tick() {
+        Update();
+
+        Add();
+        Remove();
+
+        foreach (var (_, player) in Players)
+            PlayerUpdates.Add(player.Tick());
+
+        foreach (var (_, entity) in Entities)
+            EntityUpdates.Add(entity.Tick());
+
+        //Player updates will likely take longer so we await them first
+        await Task.WhenAll(PlayerUpdates);
+        await Task.WhenAll(EntityUpdates);
+    }
+    protected virtual void Update() { }
+    private uint NextId = int.MaxValue;
+    public uint GetNextId() => NextId++;
+}
