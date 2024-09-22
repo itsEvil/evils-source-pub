@@ -1,4 +1,5 @@
-﻿using WebServer.Core;
+﻿using Shared;
+using WebServer.Core;
 using WebServer.Core.Options;
 
 namespace WebServer;

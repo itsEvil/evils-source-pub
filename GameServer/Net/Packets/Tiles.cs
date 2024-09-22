@@ -13,9 +13,8 @@ public readonly struct Tiles(ChunkData[] data) : ISend {
     private readonly ChunkData[] Data = data;
     public void Write(Writer w, Span<byte> b) {
         w.Write(b, (ushort)Data.Length);
-        for(int i =0; i < Data.Length; i++)
+        for(int i = 0; i < Data.Length; i++)
             Data[i].Write(w, b);
-
     }
 }
 

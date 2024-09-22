@@ -11,8 +11,4 @@
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Game\Objects\Player\" />
-  </ItemGroup>
-
 </Project>
