@@ -12,4 +12,5 @@ public class AppOptions {
     public int Port = 8080;
 
     public Redis Redis = new();
+    public Resources Resources = new("Data", "Game", "Web");
 }

@@ -13,6 +13,7 @@ public static class PacketHandler {
     public static IReceive GetPacket(ushort id, Reader r, Span<byte> b) {
         return (C2S)id switch
         {
+            C2S.Create => new Create(r, b),
             C2S.Register => new Register(r, b),
             C2S.Login => new Login(r, b),
             C2S.Hello => new Hello(r, b),

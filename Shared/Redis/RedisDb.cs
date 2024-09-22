@@ -1,4 +1,5 @@
 ﻿using Shared;
+using Shared.GameData;
 using Shared.Redis.Models;
 using StackExchange.Redis;
 using System.Security.Principal;
@@ -26,14 +27,7 @@ public sealed class RedisDb {
         LoadGlobals();
     }
     public void LoadGlobals() {
-        Globals = new Global(Database); 
-
-        if(!Database.KeyExists("globals")) {
-            Globals.NextAccountId = 0;
-            Globals.NextGuildId = 0;
-            Globals.NextItemId = 0;
-        }
-
+        Globals = new Global(Database);
         Globals.FlushAsync();
         SLog.Info("Loaded globals: {0}", args: [Globals.ToString()]);
     }
@@ -72,5 +66,69 @@ public sealed class RedisDb {
         account.FlushAsync();
 
         return account;
+    }
+    public Character CreateCharacter(Account account, PlayerDesc desc) {        
+        var newId = account.NextCharId++;
+        var character = new Character(account, newId) {
+            Stats = [.. desc.StatValues],
+            MaxStats = [.. desc.StatMaxValues],
+            Inventory = [.. desc.Inventory],
+            Level = desc.Level,
+            Exp = desc.Exp,
+            ExpGoal = desc.ExpGoal,
+        };
+
+        character.FlushAsync();
+        return character;
+    }
+    public Character[] GetAliveCharacters(Account account) {
+        if (account.Alive.Length == 0)
+            return [];
+
+        Character[] chars = new Character[account.Alive.Length];
+        for(var i = 0; i < account.Alive.Length; i++)
+            chars[i] = new Character(account, account.Alive[i]);
+        
+        return chars;
+    }
+
+    private News[] CachedNews;
+    private DateTime LastNewsTime;
+    public News[] GetNews() {
+        if (Globals == null)
+            LoadGlobals();
+
+        News[] news = null;
+        //Reload news
+        if(DateTime.Now - LastNewsTime > TimeSpan.FromMinutes(5)) {
+            List<News> current = [];
+            for(int i = 0; i < Globals.News.Length; i++) {
+                var @new = new News(Database, Globals.News[i]);
+                if(DateTime.Now - @new.End > TimeSpan.Zero) {
+                    Database.KeyDelete(@new.Key);
+                    continue;
+                }
+
+                current.Add(@new);
+            }
+
+            news = [.. current];
+
+            Globals.News = new uint[news.Length];
+            for(int i = 0; i < news.Length; i++) {
+                Globals.News[i] = news[i].Id;
+            }
+
+            Globals.FlushAsync();
+            CachedNews = news;
+            LastNewsTime = DateTime.Now;
+        } 
+        else
+        {
+            news = CachedNews;
+        }
+
+
+        return news;
     }
 }

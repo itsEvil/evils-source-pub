@@ -11,10 +11,12 @@ public readonly struct Hello : IReceive
         Minor = r.StringShort(b);
     }
     public void Handle(Client client) {
-        client.Rsa = new RSA();
+        client.LastMessageTime = DateTime.Now;
 
-        SLog.Debug("Version:[{0},{1}]", args: [Major, Minor]);
+
+        client.Rsa = new RSA();
         client.Tcp.EnqueueSend(new HelloAck(client.Rsa.GetPublicKey(), "Latest", "Required"));
+        //SLog.Debug("Version:[{0},{1}]", args: [Major, Minor]);
     }
 }
 public readonly struct HelloAck : ISend {

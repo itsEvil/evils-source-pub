@@ -1,0 +1,17 @@
+﻿<Objects>
+	<Object id="0" name="Empty Object">
+		<Class>GameObject</Class>
+	</Object>
+	<Object id="1" name="Empty Item">
+		<Class>Item</Class>
+	</Object>
+	<Object id="2" name="Empty Player">
+		<Class>Player</Class>
+	</Object>
+	<Object id="3" name="Empty Projectile">
+		<Class>Projectile</Class>
+	</Object>
+	<Object id="4" name="Empty Enemy">
+		<Class>Enemy</Class>
+	</Object>
+</Objects>

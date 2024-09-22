@@ -7,6 +7,7 @@ public sealed class Global(IDatabase db, string field = null, bool isAsync = fal
     public uint NextAccountId { get => GetValue<uint>("nextAccountId", 0); set => SetValue("nextAccountId", value); }
     public uint NextGuildId { get => GetValue<uint>("nextGuildId", 0); set => SetValue("nextGuildId", value); }
     public uint NextItemId { get => GetValue<uint>("nextItemId", 0); set => SetValue("nextItemId", value); }
+    public uint[] News { get => GetValue<uint[]>("news"); set => SetValue("news", value); }
     public void Write(Writer w, Span<byte> buffer) {
         w.Write(buffer, NextAccountId);
         w.Write(buffer, NextGuildId);

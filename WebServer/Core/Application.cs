@@ -1,5 +1,7 @@
-﻿using Shared.Redis;
+﻿using Shared.GameData;
+using Shared.Redis;
 using WebServer.Core.Options;
+using Resources = Shared.GameData.Resources;
 
 namespace WebServer.Core;
 public class Application : IDisposable {
@@ -9,6 +11,7 @@ public class Application : IDisposable {
     public AppOptions Options {get; private set;}
     public NetHandler NetHandler {get; private set;}
     public RedisDb Redis { get; private set; }
+    public Resources Resources { get; private set; }
     private Application() {
         if (Instance != null)
             throw new Exception("Created another instance of Singleton::Application");
@@ -22,6 +25,7 @@ public class Application : IDisposable {
     public void Awake(AppOptions options) {
         Options = options;
 
+        Resources = new Resources(options.Resources.GameDataPath);
         NetHandler.Init(options);
         Redis.Init(options.Redis.Host, options.Redis.Port, options.Redis.SyncTimeout, options.Redis.Index, options.Redis.Password);
 

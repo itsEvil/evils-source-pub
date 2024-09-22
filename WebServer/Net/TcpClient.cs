@@ -79,6 +79,7 @@ public class TcpClient {
         m_ReceiveThread = Task.Run(TickReceive);
     }
     public void Tick(Client client) {
+        client.LastMessageTime = DateTime.Now;
         while (m_ReceivePackets.TryDequeue(out var packet))
             packet.Handle(client);
     }

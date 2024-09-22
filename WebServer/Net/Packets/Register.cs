@@ -12,7 +12,6 @@ public readonly struct Register : IReceive {
         Password = r.StringShort(b);
     }
     public void Handle(Client client) {
-        //Handle rsa 
 
         //Check if account exists
         var email = client.Rsa.Decrypt(Email);
@@ -32,6 +31,7 @@ public readonly struct Register : IReceive {
         }
 
         _ = app.Redis.CreateAccount(email, password);
+
         client.Tcp.EnqueueSend(new RegisterAck(true, "Success"));
     }
 }
