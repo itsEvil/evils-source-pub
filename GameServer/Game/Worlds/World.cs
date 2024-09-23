@@ -82,16 +82,38 @@ public class World {
         Add();
         Remove();
 
+        //Start ticking all of the players and entities
         foreach (var (_, player) in Players)
             PlayerUpdates.Add(player.Tick());
 
         foreach (var (_, entity) in Entities)
             EntityUpdates.Add(entity.Tick());
 
+        //Await all of the tasks
         //Player updates will likely take longer so we await them first
+        await SetNearby();
         await Task.WhenAll(PlayerUpdates);
         await Task.WhenAll(EntityUpdates);
     }
+
+    private Task SetNearby() {
+        const float Sight = 15f;
+        const float SightSqr = Sight * Sight;
+
+        foreach(var (_, player) in Players) {
+            player.NearbyEntities.Clear();
+
+            foreach(var (_, entity) in Entities) {
+                if(Vector2.DistanceSquared(player.Position, entity.Position) > SightSqr)
+                    continue;
+                
+                player.NearbyEntities.Add(entity);
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+
     protected virtual void Update() { }
     private uint NextId = int.MaxValue;
     public uint GetNextId() => NextId++;

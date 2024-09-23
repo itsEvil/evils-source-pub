@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace GameServer.Game.Worlds;
 public sealed class Map {
-    private const int ChunkSize = 8;
+    public const int ChunkSize = 8;
+    public const int DoubleChunkSize = ChunkSize * 2;
 
     public uint Width;
     public uint Height;
@@ -28,8 +29,9 @@ public sealed class Map {
             ChunkWidth += 1;
         
         Chunks = new Chunk[ChunkWidth * ChunkHeight];
-        for (int i = 0; i < Chunks.Length; i++)
-            Chunks[i] = new Chunk(ChunkSize, ChunkSize);
+        for (uint x = 0; x < ChunkWidth; x++)
+            for(uint y = 0; y < ChunkHeight; y++)
+                Chunks[x + y * ChunkWidth] = new Chunk(x,y, ChunkSize, ChunkSize);
     }
     public Chunk GetChunk(uint x, uint y) {
         var chunkX = x / ChunkSize;
@@ -39,6 +41,21 @@ public sealed class Map {
         //var tileX = x % ChunkSize;
         //var tileY = y % ChunkSize;
 
-        return Chunks[chunkX + chunkY * ChunkWidth];
+        var idx = chunkX + chunkY * ChunkWidth;
+
+        //Add the range check yourself if its nessesary 
+#if DEBUG
+        //if (idx < 0 || idx >= Chunks.Length)
+        //    return null;
+#endif
+        return Chunks[idx];
+    }
+    public Chunk GetChunk(uint idx) {
+#if DEBUG
+        //if (idx < 0 || idx >= Chunks.Length)
+        //    return null;
+#endif
+
+        return Chunks[idx];
     }
 }

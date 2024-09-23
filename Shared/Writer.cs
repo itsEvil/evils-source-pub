@@ -193,6 +193,7 @@ public sealed class Writer
     public void Write(Span<byte> buffer, string value)
     {
         var bytes = Encoding.UTF8.GetBytes(value);
+        Write(buffer, (short)bytes.Length);
         if (bytes.Length <= 0)
         {
 #if DEBUG
@@ -211,7 +212,6 @@ public sealed class Writer
             return;
         }
 
-        Write(buffer, (short)bytes.Length);
         bytes.CopyTo(buffer[Position..]);
         Position += bytes.Length;
     }
@@ -221,6 +221,7 @@ public sealed class Writer
     public void WriteStringInt(Span<byte> buffer, string value)
     {
         var bytes = Encoding.UTF8.GetBytes(value);
+        Write(buffer, bytes.Length);
         if (bytes.Length <= 0)
         {
 #if DEBUG
@@ -239,7 +240,6 @@ public sealed class Writer
             return;
         }
 
-        Write(buffer, bytes.Length);
         bytes.CopyTo(buffer[Position..]);
         Position += bytes.Length;
     }

@@ -1,6 +1,5 @@
 ﻿using Shared;
 using GameServer.Net.Interfaces;
-using Shared.Interfaces;
 using System.Numerics;
 
 namespace GameServer.Net.Packets;
@@ -25,6 +24,7 @@ public readonly struct Move : IReceive {
         }
 
         client.Player.Position = Position;
+        client.Player.OnMove();
     }
 }
 

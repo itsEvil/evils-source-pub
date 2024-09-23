@@ -1,21 +1,21 @@
 ﻿using Shared;
 using GameServer.Net.Interfaces;
 using Shared.Interfaces;
+using GameServer.Game.Worlds;
 
 namespace GameServer.Net.Packets;
+public readonly struct Tiles(List<Chunk> chunks) : ISend {
+    public ushort Id => (ushort)S2C.Tiles;
+    private readonly List<Chunk> Chunks = chunks;
+    public void Write(Writer w, Span<byte> b) {
+        w.Write(b, (ushort)Chunks.Count);
+        for(int i = 0; i < Chunks.Count; i++)
+            Chunks[i].Write(w, b);
+    }
+}
 public readonly struct TilesAck : IReceive {
     public TilesAck(Reader r, Span<byte> b) { }
     public void Handle(Client client) { }
-}
-//Basically Map info
-public readonly struct Tiles(ChunkData[] data) : ISend {
-    public ushort Id => (ushort)S2C.Tiles;
-    private readonly ChunkData[] Data = data;
-    public void Write(Writer w, Span<byte> b) {
-        w.Write(b, (ushort)Data.Length);
-        for(int i = 0; i < Data.Length; i++)
-            Data[i].Write(w, b);
-    }
 }
 
 public sealed class ChunkData(uint x, uint y, uint[] tiles) : IWriteable {

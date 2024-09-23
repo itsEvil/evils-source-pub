@@ -15,6 +15,8 @@ public class Entity {
     public World World;
     public Vector2 Position;
 
+    public int OwnerId = -1;
+
     protected readonly Dictionary<StatType, object> Stats = [];
     public Entity(uint uniqueId, uint objectId) {
         UniqueId = uniqueId;
