@@ -128,6 +128,7 @@ public class TcpClient
     //Ticked on worker
     public void TickReceive()
     {
+        Thread.CurrentThread.IsBackground = true;
         while (!Source.IsCancellationRequested)
         {
             if (m_Socket == null)
