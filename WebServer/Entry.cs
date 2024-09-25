@@ -5,11 +5,15 @@ using WebServer.Core.Options;
 namespace WebServer;
 public sealed class Program {
     static int Main(string[] args) {
+        //Todo?
+        //Add a args parser?
+        //Add a json options file?
+        
         var b = Builder.Create();
 
-        b.AddOptions<AppOptions>((options) => { 
-        
-        
+        b.AddOptions<AppOptions>((options) => {
+            options.Name = "Local - WebServer";
+            options.Port = 8080;
         });
 
         using var app = b.Build();

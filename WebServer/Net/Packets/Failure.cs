@@ -3,12 +3,10 @@ using WebServer.Net.Interfaces;
 
 namespace WebServer.Net.Packets;
 public readonly struct FailureAck : IReceive {
-    private readonly string Message;
     public FailureAck(Reader r, Span<byte> b) { 
-        Message = r.StringShort(b);
     }
     public void Handle(Client client) {
-        client.Disconnect($"FailureAck: {Message}");
+        client.Disconnect($"FailureAck");
     }
 }
 public readonly struct Failure : ISend {

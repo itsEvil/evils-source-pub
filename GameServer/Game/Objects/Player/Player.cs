@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace GameServer.Game.Objects;
 public partial class Player : Entity {
     private readonly Client Client;
-    private readonly string Name;
+    public readonly string Name;
     public Player(Client client, uint uniqueId, uint objectId) : base(uniqueId, objectId) {
         Client = client;
         Name = client.Account.Name;

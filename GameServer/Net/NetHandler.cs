@@ -3,6 +3,7 @@ using System.Net;
 using System.Collections.Concurrent;
 using Shared;
 using GameServer.Core.Options;
+using Shared.Redis;
 namespace GameServer.Net;
 public class NetHandler
 {
@@ -30,13 +31,13 @@ public class NetHandler
 
     public void Init(AppOptions options)
     {
-        Backlog = options.Backlog;
-        MaxConnections = options.MaxConnections;
-        MaxConnectionsPerIp = options.MaxConnectionsPerIp;
+        Backlog = (int)options.Backlog;
+        MaxConnections = (int)options.MaxConnections;
+        MaxConnectionsPerIp = (int)options.MaxConnectionsPerIp;
 
         _networkTasks = new(MaxConnections);
         _tickTasks = new(MaxConnections);
-        _endPoint = new(IPAddress.Any, options.Port);
+        _endPoint = new(IPAddress.Any, (int)options.Port);
         _listener = new(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
     }
     public void AcceptConnections()
@@ -178,8 +179,9 @@ public class NetHandler
         }
     }
 
-    public async void Tick()
-    {
+    public async void Tick() {
+        RedisDb.Population = Clients.Count;
+
         foreach (var (_, client) in Clients)
             _tickTasks.Add(client.Tick());
 

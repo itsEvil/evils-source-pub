@@ -1,5 +1,8 @@
-﻿using Shared.GameData;
+﻿using Shared;
+using Shared.GameData;
 using Shared.Redis;
+using Shared.TimedSystems;
+using System.Diagnostics;
 using WebServer.Core.Options;
 using Resources = Shared.GameData.Resources;
 
@@ -12,12 +15,14 @@ public class Application : IDisposable {
     public NetHandler NetHandler {get; private set;}
     public RedisDb Redis { get; private set; }
     public Resources Resources { get; private set; }
+    public Systems Systems { get; private set; }
     private Application() {
         if (Instance != null)
             throw new Exception("Created another instance of Singleton::Application");
         Instance = this;
         NetHandler = new();
-        Redis = new();
+        Redis = RedisDb.Create();
+        Systems = new();
     }
     public static Application Get() {
         return Instance ?? new Application();
@@ -28,19 +33,27 @@ public class Application : IDisposable {
         Resources = new Resources(options.Resources.GameDataPath);
         NetHandler.Init(options);
         Redis.Init(options.Redis.Host, options.Redis.Port, options.Redis.SyncTimeout, options.Redis.Index, options.Redis.Password);
+        Redis.SetMe(options.Name, options.Address, options.Port, 0, options.MaxPopulation, 0);
+        Systems.Add<RedisUpdater>();
+
 
         Task.Run(NetHandler.AcceptConnections);
     }
     public int Run() {
         Task.Run(NetHandler.NetworkTick);
-        
-        while (!_terminate) {
-            //var threads = Process.GetCurrentProcess().Threads;
-            //SLog.Debug("Threads: {0}", args: [threads.Count]);
-            NetHandler.Tick();
 
-            Thread.Sleep(1);
-            //move to seperate thread
+        var watch = Stopwatch.StartNew();
+
+        while (!_terminate) {
+            watch.Restart();
+            NetHandler.Tick();
+            Systems.Update();
+
+            watch.Stop();
+
+            var sleep = Math.Abs(watch.ElapsedMilliseconds - Time.PerGameTick);
+            if (sleep > 0)
+                Thread.Sleep((int)sleep);
         }
 
         return 0;
@@ -48,10 +61,7 @@ public class Application : IDisposable {
     public void Stop() {
         _terminate = true;
     }
-    public void Tick() {
-
-    }
     public void Dispose() {
-
+        Systems.Dispose();
     }
 }

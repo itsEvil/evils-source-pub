@@ -1,4 +1,5 @@
 ﻿using Shared;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
@@ -30,6 +31,8 @@ public class TcpClient {
 
     private CancellationTokenSource Source;
 
+    public readonly string Address = "";
+
     //Packet structure:
     //offset = index at end of packet data
     //
@@ -42,6 +45,7 @@ public class TcpClient {
         m_Socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
         m_Port = port;
         m_Address = address;
+        Address = m_Address.ToString();
         Source = new();
     }
     public TcpClient(Socket socket) {
@@ -51,6 +55,7 @@ public class TcpClient {
         {
             m_Address = endpoint.Address;
             m_Port = endpoint.Port;
+            Address = m_Address.ToString();
         }
         else
         {
@@ -138,6 +143,7 @@ public class TcpClient {
         m_ReceiveThread = null;
     }
 
+    private const int MinRequiredBytes = 512;
     public void Send()
     {
         m_Writer.Reset();
@@ -147,21 +153,34 @@ public class TcpClient {
         var buffer = m_Send.Data.AsSpan();
         while (m_SendPackets.TryDequeue(out var packet))
         {
-            //Includes packet Id but not packet length
-            var packetSize = Marshal.SizeOf(packet);
 #if DEBUG
-            SLog.Debug("Send: id: {0}, size: {1}", args: [(C2S)packet.Id, packetSize]);
+            SLog.Debug("Writing packet: {0}", args: [packet.Id]);
 #endif
 
-            //Buffer is full so we should break and send our data
-            if (m_Writer.Position + (packetSize + PrefixLength) >= buffer.Length)
+            //Check if buffer can hold 512 bytes (around the size of the largest packet so far)
+            if (m_Writer.Position + MinRequiredBytes >= buffer.Length)
                 break;
 
             amount++;
 
-            m_Writer.Write(buffer, (uint)(packetSize - 6)); //minus 6 as we want to get rid of the entire header
+            //Remember the idx of the length position but skip writing it for now
+            var lengthPosition = m_Writer.Position;
+            m_Writer.Position += 4; //sizeof uint
+
+            //Write packet Id and packet data
             m_Writer.Write(buffer, (ushort)packet.Id);
             packet.Write(m_Writer, buffer);
+            //Remember the position after packet data
+            var afterPosition = m_Writer.Position;
+
+            //Jump back so we can write the size of the packet
+            m_Writer.Position = lengthPosition;
+
+            //Calculate size and write it
+            var size = afterPosition - (lengthPosition + 6); //byte length of uint + ushort = 6
+            m_Writer.Write(buffer, size);
+            //Jump back to after packet data
+            m_Writer.Position = afterPosition;
         }
 
         //If we arent connected we dont try to send
@@ -175,8 +194,9 @@ public class TcpClient {
         sb.Append('[');
         for (int i = 0; i < m_Writer.Position; i++)
         {
-            if (i + 1 != m_Writer.Position)
-                sb.Append(buffer[i]).Append(',');
+            sb.Append(buffer[i]);
+            if (i + 1 < m_Writer.Position)
+                sb.Append(',');
         }
         sb.Append(']');
 
@@ -217,8 +237,9 @@ public class TcpClient {
             sb.Append('[');
             for (int i = 0; i < length; i++)
             {
-                if(i + 1 != length)
-                    sb.Append(m_Receive.Data[i]).Append(',');
+                sb.Append(m_Receive.Data[i]);
+                if (i + 1 < length)
+                    sb.Append(',');
             }
             sb.Append(']');
             SLog.Debug("Received: {0}", args: [sb.ToString()]);
@@ -241,7 +262,7 @@ public class TcpClient {
             uint packetLength = m_Reader.UInt(buffer);
             var packetId = m_Reader.UShort(buffer);
 
-            if(packetLength + (m_Reader.Position - 6) >= totalLength) {
+            if(packetLength + m_Reader.Position > totalLength) {
                 SLog.Error("Total length is smaller then packet length + position. {0}, {1}, {2}", args: [packetLength, m_Reader.Position - 6, totalLength]);
                 return;
             }

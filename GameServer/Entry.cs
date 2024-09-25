@@ -6,8 +6,9 @@ public static class Program {
     public static int Main(string[] args) {
         var b = Builder.Create();
 
-        b.AddOptions<AppOptions>((options) => { 
-        
+        b.AddOptions<AppOptions>((options) => {
+            options.Name = "Local - GameServer";
+            options.Port = 2050;
         });
 
         using var app = b.Build();

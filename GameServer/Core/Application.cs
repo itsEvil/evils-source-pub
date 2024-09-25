@@ -3,6 +3,7 @@ using GameServer.Net;
 using Shared;
 using Shared.GameData;
 using Shared.Redis;
+using Shared.TimedSystems;
 using System.Diagnostics;
 using Resources = Shared.GameData.Resources;
 
@@ -16,14 +17,16 @@ public class Application : IDisposable {
     public RedisDb Redis { get; private set; }
     public Resources Resources { get; private set; }
     public WorldsManager WorldManager { get; private set; }
+    public Systems Systems { get; private set; }
     public int ExitCode = 0;
     private Application() {
         if (Instance != null)
             throw new Exception("Created another instance of Singleton::Application");
         Instance = this;
         NetHandler = new();
-        Redis = new();
+        Redis = RedisDb.Create();
         WorldManager = new();
+        Systems = new();
     }
     public static Application Get() {
         return Instance ?? new Application();
@@ -34,7 +37,12 @@ public class Application : IDisposable {
         Resources = new Resources(options.Resources.GameDataPath);
         NetHandler.Init(options);
         Redis.Init(options.Redis.Host, options.Redis.Port, options.Redis.SyncTimeout, options.Redis.Index, options.Redis.Password);
+        Redis.SetMe(options.Name, options.Address, options.Port, 0, options.MaxPopulation, 1);
+
+
         WorldManager.Init(options);
+
+        Systems.Add<RedisUpdater>();
 
         Task.Run(NetHandler.AcceptConnections);
     }
@@ -47,10 +55,12 @@ public class Application : IDisposable {
             watch.Restart();
             NetHandler.Tick();
             WorldManager.Tick();
+            Systems.Update();
             
+
             watch.Stop();
 
-            var sleep = watch.ElapsedMilliseconds - Time.PerGameTick;
+            var sleep = Math.Abs(watch.ElapsedMilliseconds - Time.PerGameTick);
             if (sleep > 0)
                 Thread.Sleep((int)sleep);
         }

@@ -1,7 +1,7 @@
 ﻿namespace WebServer.Net;
 //To
 public enum C2S {
-    Failure = 0,
+    FailureAck = 0,
     Hello = 1,
     Login = 2,
     Register = 3,

@@ -31,10 +31,17 @@ public readonly struct Load : IReceive {
 
         World world = Application.Instance.WorldManager.Get(WorldId);
         //Put any fixes on character or inventories here
+        //Add character to world
+        if(world == null)
+        {
+            SLog.Warn("Tried to get World {0} but is null. Returning nexus world", args: [WorldId]);
+            //change world to nexus
+        }
 
         client.Character.FlushAsync();
 
         client.Player = new Player(client, world.GetNextId(), client.Character.ClassId);
+        world.Enter(client.Player, world.GetSpawnPoint());
     }
 }
 //Basically Map info

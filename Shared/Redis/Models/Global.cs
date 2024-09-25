@@ -2,7 +2,7 @@
 using StackExchange.Redis;
 
 namespace Shared.Redis.Models;
-public sealed class Global(IDatabase db, string field = null, bool isAsync = false) : RedisObject(db, "globals", field, isAsync), IWriteable
+public sealed class Global(IDatabase db) : RedisObject(db, "globals", null, false), IWriteable
 {
     public uint NextAccountId { get => GetValue<uint>("nextAccountId", 0); set => SetValue("nextAccountId", value); }
     public uint NextGuildId { get => GetValue<uint>("nextGuildId", 0); set => SetValue("nextGuildId", value); }

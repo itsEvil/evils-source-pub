@@ -52,6 +52,11 @@ public class World {
         return true;
     }
 
+    public Vector2 GetSpawnPoint()
+    {
+        return new Vector2(0, 0);
+    }
+
     private void Add()
     {
         foreach (var player in ToAddPlayer)

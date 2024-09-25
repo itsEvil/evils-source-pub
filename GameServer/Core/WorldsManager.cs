@@ -12,7 +12,12 @@ public sealed class WorldsManager {
 
     public World Create(WorldDesc desc)
     {
+        return null;
+    }
 
+    public World Get(uint id)
+    {
+        return null;
     }
 
     public async void Tick() {

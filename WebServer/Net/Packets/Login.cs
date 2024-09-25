@@ -1,5 +1,6 @@
 ﻿using Shared;
 using Shared.Redis.Models;
+using System.Xml.Linq;
 using WebServer.Core;
 using WebServer.Net.Interfaces;
 
@@ -14,8 +15,19 @@ public readonly struct Login : IReceive {
     public void Handle(Client client) {
         var redis = Application.Instance.Redis;
 
+        if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password))
+        {
+            client.Tcp.EnqueueSend(new Failure("Invalid login data"));
+            return;
+        }
+
+        if (client.Account != null) {
+            client.Tcp.EnqueueSend(new Failure("Already logged in..."));
+            return;
+        }
+
         var email = client.Rsa.Decrypt(Email);
-        SLog.Debug("Login request from {0}");
+        SLog.Debug("Login request from {0}", args: [client.Tcp.Address]);
         if (!redis.TryLogin(email, client.Rsa.Decrypt(Password))) {
             client.Tcp.EnqueueSend(new Failure("Failed to login..."));
             return;
@@ -34,13 +46,17 @@ public readonly struct Login : IReceive {
 
         client.Account = acc;
         client.LastMessageTime = DateTime.Now;
-        client.Tcp.EnqueueSend(new LoginAck(acc));
+        client.Tcp.EnqueueSend(new LoginAck(acc, redis.ServersArray));
     }
 }
-public readonly struct LoginAck(Account account) : ISend {
+public readonly struct LoginAck(Account account, Server[] servers) : ISend {
     public ushort Id => (ushort)S2C.LoginAck;
     public readonly Account Account = account;
+    public readonly Server[] Servers = servers;
     public void Write(Writer w, Span<byte> b) {
         Account.Write(w, b);
+        w.Write(b, (ushort)Servers.Length);
+        foreach (Server server in Servers)
+            server.Write(w, b);
     }
 }

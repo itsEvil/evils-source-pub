@@ -17,6 +17,7 @@ public static class PacketHandler {
             C2S.Register => new Register(r, b),
             C2S.Login => new Login(r, b),
             C2S.Hello => new Hello(r, b),
+            C2S.FailureAck => new FailureAck(r, b),
             _ => null,
         };
     }

@@ -1,11 +1,11 @@
-﻿using Shared;
-using Shared.GameData;
+﻿using Shared.GameData;
 using Shared.Redis.Models;
 using StackExchange.Redis;
-using System.Security.Principal;
 
 namespace Shared.Redis;
 public sealed class RedisDb {
+    public static RedisDb Instance { get; private set; }
+
     public ConnectionMultiplexer Redis;
     public IServer Server;
     public IDatabase Database;
@@ -13,6 +13,13 @@ public sealed class RedisDb {
 
     public Global Globals;
 
+    public Server Me;
+    public readonly List<Server> Servers = [];
+    public Server[] ServersArray = [];
+
+    public static int Population = 0;
+    private RedisDb() { Instance = this; }
+    public static RedisDb Create() => new RedisDb();
     public void Init(string host, int port, int syncTimeout, int index, string password) {
         var conString = host + ":" + port + ",syncTimeout=" + syncTimeout;
         if (!string.IsNullOrWhiteSpace(password))
@@ -26,8 +33,46 @@ public sealed class RedisDb {
         SLog.Info("Connected to redis at [{0}:{1}]", args: [host, port]);
         LoadGlobals();
     }
+    public void SetMe(string name, string address, int port, int pop, int maxPop, int type) {
+        Me = new Server(Database, name, type) {
+            Name = name,
+            IPAddress = address,
+            Population = pop,
+            MaxPopulation = maxPop,
+            Port = port,
+            ServerType = type,
+        };
+
+        var transaction = Database.CreateTransaction();
+        Me.FlushAsync(transaction);
+
+        Servers.Add(Me);
+        Models.Servers.Add(Database, Me.Name, Me.ServerType);
+        transaction.KeyExpireAsync(Me.Key, DateTime.Now + TimeSpan.FromMinutes(1));
+        transaction.Execute();
+    }
+
+    public void UpdateMe(int pop) {
+        if (Me == null)
+            throw new Exception("Me (ServerInfo) is null");
+
+        Me.Population = pop;
+
+        var transaction = Database.CreateTransaction();
+        Me.FlushAsync(transaction);
+        transaction.KeyExpireAsync(Me.Key, DateTime.Now + TimeSpan.FromMinutes(1));
+        transaction.Execute();
+    }
+
     public void LoadGlobals() {
         Globals = new Global(Database);
+        if(Globals.NextAccountId == 0)
+            Globals.NextAccountId = 0;
+        if (Globals.NextGuildId == 0)
+            Globals.NextGuildId = 0;
+        if (Globals.NextItemId == 0)
+            Globals.NextItemId = 0;
+
         Globals.FlushAsync();
         SLog.Info("Loaded globals: {0}", args: [Globals.ToString()]);
     }
@@ -44,6 +89,9 @@ public sealed class RedisDb {
         return true;
     }
 
+    public bool IsNameTaken(string name) 
+        => Names.Exists(Database, name);
+
     public bool TryLogin(string email, string password) {
         if (!Login.TryGetLogin(Database, email, out var login))
             return false;
@@ -56,14 +104,26 @@ public sealed class RedisDb {
         return true;
     }
     //This method assumes you already checked if a account exists with the same email
-    public Account CreateAccount(string email, string password) {
+    public Account CreateAccount(string email, string password, string name) {
         var newId = Globals.NextAccountId++;
+        var trans = Database.CreateTransaction();
+        Names.Add(Database, name, newId);
         var login = Login.Create(Database, email, password, newId);
         var account = new Account(Database, login.AccountId) { 
+            Name = name,
             Rank = Rank.None,
+            Id = newId,
+            NextCharId = 0,
+            GuildId = 0,
+            RegisteredTime = DateTime.UtcNow,
+            LastOnlineTime = DateTime.UtcNow,
+            Banned = false,
+            Alive = [],
         };
 
-        account.FlushAsync();
+        account.FlushAsync(trans);
+        Globals.FlushAsync(trans);
+        trans.Execute();
 
         return account;
     }
@@ -130,5 +190,14 @@ public sealed class RedisDb {
 
 
         return news;
+    }
+    public void Dispose() {
+        Database = null;
+        Server = null;
+        Redis = null;
+        Sub = null;
+        Globals = null;
+        Me = null;
+        Servers.Clear();
     }
 }
