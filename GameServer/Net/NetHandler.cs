@@ -29,15 +29,20 @@ public class NetHandler
     private IPEndPoint _endPoint;
     private Socket _listener;
 
+    private AppOptions Options;
+    private int Port;
     public void Init(AppOptions options)
     {
-        Backlog = (int)options.Backlog;
-        MaxConnections = (int)options.MaxConnections;
-        MaxConnectionsPerIp = (int)options.MaxConnectionsPerIp;
+        Options = options;
+        Port = options.Port;
+
+        Backlog = (int)Options.Backlog;
+        MaxConnections = (int)Options.MaxConnections;
+        MaxConnectionsPerIp = (int)Options.MaxConnectionsPerIp;
 
         _networkTasks = new(MaxConnections);
         _tickTasks = new(MaxConnections);
-        _endPoint = new(IPAddress.Any, (int)options.Port);
+        _endPoint = new(IPAddress.Any, Port);
         _listener = new(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
     }
     public void AcceptConnections()
@@ -51,7 +56,7 @@ public class NetHandler
 
         _listener.Bind(_endPoint);
         _listener.Listen(Backlog);
-        SLog.Info("Listening::On::{0}:{1}", _endPoint.Address.ToString(), 2050);
+        SLog.Info("Listening::On::{0}:{1}", _endPoint.Address.ToString(), Port);
 
         while (!Terminate)
         {

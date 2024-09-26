@@ -188,19 +188,19 @@ public class TcpClient {
             return;
 
 #if DEBUG
-        SLog.Debug("Sending {0} packets", args: [amount]);
-
-        var sb = new StringBuilder();
-        sb.Append('[');
-        for (int i = 0; i < m_Writer.Position; i++)
-        {
-            sb.Append(buffer[i]);
-            if (i + 1 < m_Writer.Position)
-                sb.Append(',');
-        }
-        sb.Append(']');
-
-        SLog.Debug("Sent: {0}", args: [sb.ToString()]);
+        //SLog.Debug("Sending {0} packets", args: [amount]);
+        //
+        //var sb = new StringBuilder();
+        //sb.Append('[');
+        //for (int i = 0; i < m_Writer.Position; i++)
+        //{
+        //    sb.Append(buffer[i]);
+        //    if (i + 1 < m_Writer.Position)
+        //        sb.Append(',');
+        //}
+        //sb.Append(']');
+        //
+        //SLog.Debug("Sent: {0}", args: [sb.ToString()]);
 #endif
 
 
@@ -233,16 +233,16 @@ public class TcpClient {
         
             m_Reader.Reset(length);
 #if DEBUG
-            var sb = new StringBuilder();
-            sb.Append('[');
-            for (int i = 0; i < length; i++)
-            {
-                sb.Append(m_Receive.Data[i]);
-                if (i + 1 < length)
-                    sb.Append(',');
-            }
-            sb.Append(']');
-            SLog.Debug("Received: {0}", args: [sb.ToString()]);
+            //var sb = new StringBuilder();
+            //sb.Append('[');
+            //for (int i = 0; i < length; i++)
+            //{
+            //    sb.Append(m_Receive.Data[i]);
+            //    if (i + 1 < length)
+            //        sb.Append(',');
+            //}
+            //sb.Append(']');
+            //SLog.Debug("Received: {0}", args: [sb.ToString()]);
 #endif
             Read(length);
             m_Receive.Reset();
@@ -268,12 +268,12 @@ public class TcpClient {
             }
 
             if(!PacketHandler.TryGetPacket(packetId, m_Reader, m_Receive.Data, out var packet)) {
-                SLog.Error("Failed to find packet with id {0}", args: [packetId]);
+                SLog.Error("Failed to find packet with id {0}", args: [(C2S)packetId]);
                 continue;
             }
 
             m_ReceivePackets.Enqueue(packet);
-            SLog.Debug("Receive id:{0} length:{1} total:{2}", args: [packetId, packetLength, totalLength]);
+            SLog.Debug("Receive id:{0} length:{1} total:{2}", args: [(C2S)packetId, packetLength, totalLength]);
         }
     }
 }

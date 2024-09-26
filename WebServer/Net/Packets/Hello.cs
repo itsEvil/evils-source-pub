@@ -12,6 +12,9 @@ public readonly struct Hello : IReceive
         Minor = r.UInt(b);
     }
     public void Handle(Client client) {
+
+        //todo
+        //show error ui
         if(Major != Application.Instance.Options.MajorVersion) {
             client.Tcp.EnqueueSend(new Failure($"Latest game version: {Application.Instance.Options.MajorVersion}.{Application.Instance.Options.MinorVersion}"));
             client.LateDisconnect = true;

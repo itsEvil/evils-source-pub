@@ -44,9 +44,10 @@ public readonly struct Login : IReceive {
             return;
         }
 
+        SLog.Debug("Sending back LoginAck to {0}", args: [acc.Name]);
         client.Account = acc;
         client.LastMessageTime = DateTime.Now;
-        client.Tcp.EnqueueSend(new LoginAck(acc, redis.ServersArray));
+        client.Tcp.EnqueueSend(new LoginAck(acc, redis.GameServers));
     }
 }
 public readonly struct LoginAck(Account account, Server[] servers) : ISend {

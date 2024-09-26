@@ -28,6 +28,8 @@ public sealed class RedisUpdater : ISystem {
 
         ToRemove.Clear();
         Found.Clear();
+
+        bool changed = false;
         
         foreach(var key in keys) {
             Found.Add(false);
@@ -42,6 +44,7 @@ public sealed class RedisUpdater : ISystem {
                 //Local Server list contains server name but database doesnt anymore
                 //so we need to remove
                 ToRemove.Add(i);
+                changed = true;
             }
         }
 
@@ -50,6 +53,7 @@ public sealed class RedisUpdater : ISystem {
                 continue;
 
             Redis.Servers.RemoveAt(idx);
+            changed = true;
         }
 
         for(int i = 0; i < keys.Length; i++) {
@@ -68,8 +72,23 @@ public sealed class RedisUpdater : ISystem {
             }
 
             Redis.Servers.Add(new Server(Redis.Database, words[^1], type));
+            changed = true;
         }
 
-        Redis.ServersArray = [.. Redis.Servers];
+        if (!changed)
+            return;
+
+        List<Server> web = [];
+        List<Server> game = [];
+
+        foreach(var server in Redis.Servers) {
+            switch(server.ServerType) {
+                case 0: web.Add(server); break;
+                case 1: game.Add(server); break;
+            }
+        }
+
+        Redis.WebServers = [.. web];
+        Redis.GameServers = [.. game];
     }
 }

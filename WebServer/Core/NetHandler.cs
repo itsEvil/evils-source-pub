@@ -24,6 +24,9 @@ public class NetHandler
     private readonly Queue<Client> _clientPool = [];
     private readonly Queue<Client> _toAddClient = [];
     private readonly Queue<int> _toRemoveClient = [];
+    
+    private AppOptions Options;
+    private int Port;
 
     private List<Task> _tickTasks;
     private List<Task> _networkTasks;
@@ -31,13 +34,15 @@ public class NetHandler
     private Socket _listener;
 
     public void Init(AppOptions options) {
-        Backlog = options.Backlog;
-        MaxConnections = options.MaxConnections;
-        MaxConnectionsPerIp = options.MaxConnectionsPerIp;
+        Options = options;
+        Port = Options.Port;
+        Backlog = Options.Backlog;
+        MaxConnections = Options.MaxConnections;
+        MaxConnectionsPerIp = Options.MaxConnectionsPerIp;
 
         _networkTasks = new(MaxConnections);
         _tickTasks = new(MaxConnections);
-        _endPoint = new(IPAddress.Any, options.Port);
+        _endPoint = new(IPAddress.Any, Port);
         _listener = new(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
     }
     public void AcceptConnections()
@@ -51,7 +56,7 @@ public class NetHandler
 
         _listener.Bind(_endPoint);
         _listener.Listen(Backlog);
-        SLog.Info("Listening::On::{0}:{1}", _endPoint.Address.ToString(), 2050);
+        SLog.Info("Listening::On::{0}:{1}", _endPoint.Address.ToString(), Port);
 
         while (!Terminate)
         {

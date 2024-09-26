@@ -15,7 +15,8 @@ public sealed class RedisDb {
 
     public Server Me;
     public readonly List<Server> Servers = [];
-    public Server[] ServersArray = [];
+    public Server[] GameServers = [];
+    public Server[] WebServers = [];
 
     public static int Population = 0;
     private RedisDb() { Instance = this; }
