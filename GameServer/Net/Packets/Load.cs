@@ -51,6 +51,7 @@ public readonly struct LoadAck : ISend {
     public readonly string WorldDescription = "";
     public readonly int Width = 0;
     public readonly int Height = 0;
+    public readonly int ChunkSize = Map.ChunkSize;
     public readonly bool DisplayNames = false;
     public LoadAck(string worldName, string worldDesc, int width, int height, bool displayNames) {
         WorldName = worldName;
@@ -64,6 +65,7 @@ public readonly struct LoadAck : ISend {
         w.Write(b, WorldDescription);
         w.Write(b, Width);
         w.Write(b, Height);
+        w.Write(b, ChunkSize);
         w.Write(b, DisplayNames);
     }
 }

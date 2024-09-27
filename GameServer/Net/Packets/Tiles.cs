@@ -17,16 +17,3 @@ public readonly struct TilesAck : IReceive {
     public TilesAck(Reader r, Span<byte> b) { }
     public void Handle(Client client) { }
 }
-
-public sealed class ChunkData(uint x, uint y, uint[] tiles) : IWriteable {
-    public readonly uint X = x;
-    public readonly uint Y = y;
-    public readonly uint[] Tiles = tiles;
-    public void Write(Writer w, Span<byte> b) {
-        w.Write(b, X);
-        w.Write(b, Y);
-        w.Write(b, (ushort)Tiles.Length);
-        for(int i = 0; i < Tiles.Length; i++)
-            w.Write(b, Tiles[i]);
-    }
-}

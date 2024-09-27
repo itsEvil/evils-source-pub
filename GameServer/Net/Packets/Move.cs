@@ -28,9 +28,11 @@ public readonly struct Move : IReceive {
     }
 }
 
-public readonly struct MoveAck : ISend {
+public readonly struct MoveAck(Vector2 position) : ISend {
     public ushort Id => (ushort)S2C.MoveAck;
+    public readonly Vector2 Position = position;
     public void Write(Writer w, Span<byte> b) {
-
+        w.Write(b, Position.X);
+        w.Write(b, Position.Y);
     }
 }

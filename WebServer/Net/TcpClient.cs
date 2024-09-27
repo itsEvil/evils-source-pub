@@ -154,7 +154,7 @@ public class TcpClient {
         while (m_SendPackets.TryDequeue(out var packet))
         {
 #if DEBUG
-            SLog.Debug("Writing packet: {0}", args: [packet.Id]);
+            SLog.Debug("Writing packet: {0}", args: [(S2C)packet.Id]);
 #endif
 
             //Check if buffer can hold 512 bytes (around the size of the largest packet so far)
