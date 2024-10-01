@@ -9,6 +9,6 @@ public enum StatType : byte {
 
     Inventory = 5, //byte length then array of ItemData
     Stats = 6, //byte length then array of uints
-    Condition = 7, //64 bit flag
+    Condition = 7, //(ushort) amount of effects, (ushort)condition id, (ushort) key/duration, (ushort)value/stacks
     Name = 8,
 }
