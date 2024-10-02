@@ -9,6 +9,7 @@ public enum C2S {
     ObjectsAct = 5,
     DropsAck = 6,
     Move = 7,
+    UpdateAck = 8,
 }
 //From
 public enum S2C {
@@ -20,4 +21,5 @@ public enum S2C {
     Objects = 5,
     Drops = 6,
     MoveAck = 7,
+    Update = 8,
 }

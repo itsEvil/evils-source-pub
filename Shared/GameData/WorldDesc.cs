@@ -7,11 +7,15 @@ public sealed class WorldDesc {
     public readonly string Description;
     public readonly uint Difficulty;
     public readonly string FilePath;
+    public readonly bool DisplayNames;
+    public readonly byte ChunkSize;
     public WorldDesc(XElement e, uint id, string name, string resourcePath) {
         UniqueId = id;
         Name = name;
         Description = e.ParseString("Description", "");
         Difficulty = e.ParseUInt("Difficulty");
+        ChunkSize = (byte)e.ParseUInt("ChunkSize", undefined: 8);
+        DisplayNames = e.ParseBool("DisplayNames");
         FilePath = Path.Combine(resourcePath, e.ParseString("Path", ""));
     }
     public bool TryGetMapData(out byte[] data) {

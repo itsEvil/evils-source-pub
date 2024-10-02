@@ -1,5 +1,4 @@
-﻿using Shared;
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -193,7 +192,7 @@ public sealed class Writer
     public void Write(Span<byte> buffer, string value)
     {
         var bytes = Encoding.UTF8.GetBytes(value);
-        Write(buffer, (short)bytes.Length);
+        Write(buffer, (ushort)bytes.Length);
         if (bytes.Length <= 0)
         {
 #if DEBUG
@@ -242,5 +241,44 @@ public sealed class Writer
 
         bytes.CopyTo(buffer[Position..]);
         Position += bytes.Length;
+    }
+
+    /// <summary>
+    /// Only primatives are supported by this method.
+    /// </summary>
+    public void WriteArray<T>(Span<byte> buffer, T[] array)
+    {
+        Write(buffer, (ushort)array.Length);
+        var span = array.AsSpan();
+        for (int i = 0; i < array.Length; i++)
+            Write(buffer, span[i]);
+    }
+    /// <summary>
+    /// Write a primative of type T
+    /// </summary>
+    public void Write<T>(Span<byte> b, T value)
+    {
+        switch (value)
+        {
+            case byte v: Write(b, v); break;
+            case bool v: Write(b, v); break;
+            case short v: Write(b, v); break;
+            case ushort v: Write(b, v); break;
+            case int v: Write(b, v); break;
+            case uint v: Write(b, v); break;
+            case float v: Write(b, v); break;
+            case double v: Write(b, v); break;
+            case long v: Write(b, v); break;
+            case ulong v: Write(b, v); break;
+            case string v:
+                {
+                    if (v.Length >= ushort.MaxValue)
+                        WriteStringInt(b, v);
+                    else
+                        Write(b, v);
+                }
+                break;
+            default: throw new Exception($"Type {value.GetType()} not supported by Writer");
+        }
     }
 }

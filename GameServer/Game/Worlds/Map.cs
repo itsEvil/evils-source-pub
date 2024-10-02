@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace GameServer.Game.Worlds;
 public sealed class Map {
-    public const int ChunkSize = 8;
-    public const int DoubleChunkSize = ChunkSize * 2;
+    public readonly byte ChunkSize;
+    public readonly byte DoubleChunkSize;
+    //public const int ChunkSize = 8;
+    //public const int DoubleChunkSize = ChunkSize * 2;
 
     public uint Width;
     public uint Height;
@@ -16,9 +18,11 @@ public sealed class Map {
     private readonly uint ChunkWidth;
     private readonly uint ChunkHeight;
 
-    public Map(uint width, uint height) {
+    public Map(uint width, uint height, byte chunkSize = 8) {
         Width = width;
         Height = height;
+        ChunkSize = chunkSize;
+        DoubleChunkSize = (byte)(ChunkSize * 2);
 
         ChunkWidth = Width / ChunkSize;
         ChunkHeight = Height / ChunkSize;

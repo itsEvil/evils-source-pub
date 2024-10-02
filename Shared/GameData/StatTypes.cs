@@ -1,6 +1,6 @@
 ﻿namespace Shared.GameData;
 
-public enum StatType : byte {
+public enum StatType : ushort {
     Nothing = 0, //should never happen but if it does ignore...
     MaxHealth = 1,
     MaxResource = 2, //mana etc

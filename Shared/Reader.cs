@@ -239,4 +239,49 @@ public sealed class Reader
 
         return data;
     }
+
+    /// <summary>
+    /// Only primatives are supported by this method, try not to use this as it will allocate objects when reading the primative
+    /// </summary>
+    public T[] ReadArray<T>(Span<byte> b)
+    {
+        var len = UShort(b);
+
+        T[] arr = new T[len];
+
+        for (int i = 0; i < arr.Length; i++)
+            arr[i] = Read<T>(b);
+
+        return arr;
+    }
+    /// <summary>
+    /// Read a primative of type T, try not to use this as it needs to cast to object then T when reading the primative
+    /// </summary>
+    public T Read<T>(Span<byte> b, T ignoreThisParameter = default)
+    {
+        switch (ignoreThisParameter)
+        {
+            case byte: return (T)(object)Byte(b);
+            case bool: return (T)(object)Bool(b); 
+            case short: return (T)(object)Short(b);
+            case ushort: return (T)(object)UShort(b);
+            case int: return (T)(object)Int(b);
+            case uint: return (T)(object)UInt(b);
+            case float: return (T)(object)Float(b);
+            case double: return (T)(object)Double(b);
+            case long: return (T)(object)Long(b);
+            case ulong: return (T)(object)ULong(b);
+            case string: {
+                    var len = Int(b);
+
+                    //If the length of the string is less than 65,535
+                    if (len < ushort.MaxValue) {
+                        Position -= 4;
+                        return (T)(object)StringShort(b);
+                    }
+                    else return (T)(object)StringInt(b);
+                }
+            default: throw new Exception($"Type {ignoreThisParameter.GetType()} not supported by Writer");
+        }
+    }
 }

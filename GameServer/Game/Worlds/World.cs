@@ -1,5 +1,6 @@
 ﻿using GameServer.Game.Objects;
 using Shared;
+using Shared.GameData;
 using System.Numerics;
 namespace GameServer.Game.Worlds;
 public class World {
@@ -17,12 +18,12 @@ public class World {
 
     public readonly uint Id;
     public readonly Map Map;
-    public World(uint worldId /*, WorldDesc worldDesc */)
-    {
+    public readonly WorldDesc Desc;
+    public World(uint worldId, WorldDesc worldDesc) {
         Id = worldId;
-        
-        //load map from world desc not hard coded
-        Map = new Map(1024, 1024);
+        Desc = worldDesc;
+
+        Map = new Map(1024, 1024, worldDesc.ChunkSize);
     }
 
     public void Enter(Entity entity, Vector2 at) {

@@ -42,6 +42,8 @@ public readonly struct Load : IReceive {
 
         client.Player = new Player(client, world.GetNextId(), client.Character.ClassId);
         world.Enter(client.Player, world.GetSpawnPoint());
+
+        client.Tcp.EnqueueSend(new LoadAck(world.Desc.Name, world.Desc.Description, world.Map.Width, world.Map.Height, world.Map.ChunkSize, world.Desc.DisplayNames));
     }
 }
 //Basically Map info
@@ -49,15 +51,16 @@ public readonly struct LoadAck : ISend {
     public ushort Id => (ushort)S2C.LoadAck;
     public readonly string WorldName = "";
     public readonly string WorldDescription = "";
-    public readonly int Width = 0;
-    public readonly int Height = 0;
-    public readonly int ChunkSize = Map.ChunkSize;
+    public readonly uint Width = 0;
+    public readonly uint Height = 0;
+    public readonly ushort ChunkSize = 8;
     public readonly bool DisplayNames = false;
-    public LoadAck(string worldName, string worldDesc, int width, int height, bool displayNames) {
+    public LoadAck(string worldName, string worldDesc, uint width, uint height, ushort chunkSize, bool displayNames) {
         WorldName = worldName;
         WorldDescription = worldDesc;
         Width = width;
         Height = height;
+        ChunkSize = chunkSize;
         DisplayNames = displayNames;
     }
     public void Write(Writer w, Span<byte> b) {

@@ -1,6 +1,5 @@
 ﻿using Shared;
 using GameServer.Net.Interfaces;
-using Shared.Interfaces;
 using GameServer.Game.Worlds;
 
 namespace GameServer.Net.Packets;
