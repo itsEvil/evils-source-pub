@@ -1,0 +1,6 @@
+﻿<Worlds>
+	<World name="Town" id="0">
+		<Desc>This is a town.</Desc>
+		<Path>Town\Town.map</Path>
+	</World>
+</Worlds>

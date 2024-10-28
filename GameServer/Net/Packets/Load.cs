@@ -43,7 +43,7 @@ public readonly struct Load : IReceive {
         client.Player = new Player(client, world.GetNextId(), client.Character.ClassId);
         world.Enter(client.Player, world.GetSpawnPoint());
 
-        client.Tcp.EnqueueSend(new LoadAck(world.Desc.Name, world.Desc.Description, world.Map.Width, world.Map.Height, world.Map.ChunkSize, world.Desc.DisplayNames));
+        client.Tcp.EnqueueSend(new LoadAck(world.Desc.Name, world.Desc.Description, world.Map.Width, world.Map.Height, world.Map.ChunkSizeWidth, world.Desc.DisplayNames));
     }
 }
 //Basically Map info

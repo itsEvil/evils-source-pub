@@ -15,13 +15,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Data\Game\ExampleItems.xml">
+    <None Update="Data\Game\Worlds\Town\Town.map">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Data\Game\ExamplePlayers.xml">
+    <None Update="Data\Game\Worlds\Worlds.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Data\Game\Example.xml">
+    <None Update="Data\Game\Xmls\ExampleItems.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Game\Xmls\ExamplePlayers.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Game\Xmls\Example.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

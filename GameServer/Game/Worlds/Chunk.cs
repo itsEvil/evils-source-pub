@@ -8,12 +8,34 @@ public sealed class Chunk : IWriteable {
     public readonly byte Height;
     public readonly uint X;
     public readonly uint Y;
-    public Chunk(uint x, uint y, byte width, byte height) {
+    public Chunk(uint x, uint y, byte width, byte height, uint initValue = 0) {
         X = x;
         Y = y;
         Width = width;
         Height = height;
         Tiles = new uint[Width * Height];
+
+        if (initValue == 0)
+            return;
+
+        for(int ix = 0; ix < Tiles.Length; ix++)
+        {
+            for(int  iy = 0; iy < Height; iy++)
+            {
+                Tiles[Width * ix + iy] = initValue;
+            }
+        }
+    }
+	public Chunk(Reader r, Span<byte> b) {
+        Width = r.Byte(b);
+        Height = r.Byte(b);
+        X = r.UInt(b);
+        Y = r.UInt(b);
+        var len = r.UShort(b);
+        Tiles = new uint[len];
+
+        for (int i = 0; i < Tiles.Length; i++)
+            Tiles[i] = r.UInt(b);
     }
     public uint this[uint x, uint y] {
         get => Get(x,y);
@@ -25,7 +47,7 @@ public sealed class Chunk : IWriteable {
             throw new Exception("Chunk get out of bounds");
 #endif
 
-        return Tiles[x + y * Width];
+        return Tiles[Width * x + y];
     }
     public void Set(uint x, uint y, uint value) {
 #if DEBUG
@@ -33,11 +55,13 @@ public sealed class Chunk : IWriteable {
             throw new Exception("Chunk get out of bounds");
 #endif
 
-        Tiles[x + y * Width] = value;
+        Tiles[Width * x + y] = value;
     }
 
     public void Write(Writer w, Span<byte> b)
     {
+		w.Write(b, Width);
+		w.Write(b, Height);
         w.Write(b, X);
         w.Write(b, Y);
         w.Write(b, (ushort)Tiles.Length);

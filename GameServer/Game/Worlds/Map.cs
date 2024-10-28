@@ -6,51 +6,43 @@ using System.Threading.Tasks;
 
 namespace GameServer.Game.Worlds;
 public sealed class Map {
-    public readonly byte ChunkSize;
-    public readonly byte DoubleChunkSize;
-    //public const int ChunkSize = 8;
-    //public const int DoubleChunkSize = ChunkSize * 2;
+    public readonly byte ChunkSizeWidth;
+    public readonly byte ChunkSizeHeight;
 
     public uint Width;
     public uint Height;
 
     public Chunk[] Chunks = [];
-    private readonly uint ChunkWidth;
-    private readonly uint ChunkHeight;
-
-    public Map(uint width, uint height, byte chunkSize = 8) {
+    public readonly uint ChunkWidth;
+    public readonly uint ChunkHeight;
+    public Map(uint width, uint height, byte chunkSizeWidth = 8, byte chunkSizeHeight = 8, uint initValue = 0) {
         Width = width;
         Height = height;
-        ChunkSize = chunkSize;
-        DoubleChunkSize = (byte)(ChunkSize * 2);
+        ChunkSizeWidth = chunkSizeWidth;
+        ChunkSizeHeight = chunkSizeHeight;
 
-        ChunkWidth = Width / ChunkSize;
-        ChunkHeight = Height / ChunkSize;
+        ChunkWidth = Width / ChunkSizeWidth;
+        ChunkHeight = Height / ChunkSizeHeight;
 
-        if(Width % ChunkSize != 0)
+        if(Width % ChunkSizeWidth != 0)
             ChunkWidth += 1;
-        if(Height % ChunkSize != 0)
+        if(Height % ChunkSizeWidth != 0)
             ChunkWidth += 1;
         
         Chunks = new Chunk[ChunkWidth * ChunkHeight];
         for (uint x = 0; x < ChunkWidth; x++)
             for(uint y = 0; y < ChunkHeight; y++)
-                Chunks[x + y * ChunkWidth] = new Chunk(x,y, ChunkSize, ChunkSize);
+                Chunks[ChunkWidth * x + y] = new Chunk(x, y, ChunkSizeWidth, ChunkSizeHeight, initValue);
     }
     public Chunk GetChunk(uint x, uint y) {
-        var chunkX = x / ChunkSize;
-        var chunkY = y / ChunkSize;
+        var chunkX = x / ChunkSizeWidth;
+        var chunkY = y / ChunkSizeHeight;
 
-        //To get tile within chunk??
-        //var tileX = x % ChunkSize;
-        //var tileY = y % ChunkSize;
+        var idx = ChunkWidth * chunkX + chunkY;
 
-        var idx = chunkX + chunkY * ChunkWidth;
-
-        //Add the range check yourself if its nessesary 
 #if DEBUG
-        //if (idx < 0 || idx >= Chunks.Length)
-        //    return null;
+        if (idx < 0 || idx >= Chunks.Length)
+            return null;
 #endif
         return Chunks[idx];
     }
@@ -61,5 +53,9 @@ public sealed class Map {
 #endif
 
         return Chunks[idx];
+    }
+    public Chunk this[uint x, uint y]
+    {
+        get => GetChunk(x, y);
     }
 }

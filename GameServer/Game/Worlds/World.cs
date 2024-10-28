@@ -23,7 +23,7 @@ public class World {
         Id = worldId;
         Desc = worldDesc;
 
-        Map = new Map(1024, 1024, worldDesc.ChunkSize);
+        Map = new Map(1024, 1024, worldDesc.ChunkSizeWidth, worldDesc.ChunkSizeHeight, worldDesc.DefaultTile);
     }
 
     public void Enter(Entity entity, Vector2 at) {

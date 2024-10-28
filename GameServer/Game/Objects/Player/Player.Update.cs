@@ -43,8 +43,10 @@ public partial class Player  {
         var x = (uint)Position.X;
         var y = (uint)Position.Y;
 
-        var centerPos = x + y * Map.ChunkSize;
-        var currentChunk = World.Map.GetChunk(centerPos);
+        var map = World.Map;
+		var centerPos = map.ChunkSizeWidth * x + y;
+        //var centerPos = x + y * Map.ChunkSize;
+        var currentChunk = map.GetChunk(centerPos);
         //Position has not changed enough to send new chunks
         if(currentChunk == LastChunk)
             return;
@@ -60,41 +62,72 @@ public partial class Player  {
 
         //All chunk positions
 
-        var aboveOne = x + (y + Map.ChunkSize) * Map.ChunkSize;
-        var aboveTwo = x + (y + Map.DoubleChunkSize) * Map.ChunkSize;
 
-        var belowOne = x + (y - Map.ChunkSize) * Map.ChunkSize;
-        var belowTwo = x + (y - Map.DoubleChunkSize) * Map.ChunkSize;
 
-        var leftOne = (x - Map.ChunkSize) + y * Map.ChunkSize;
-        var leftTwo = (x - Map.DoubleChunkSize) + y * Map.ChunkSize;
+        //5 center chunks in a plus form
+        AddChunk(centerPos);
+        AddChunk(map.ChunkWidth * (uint)(((y + (1 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)(x / map.ChunkHeight));
+        AddChunk(map.ChunkWidth * (uint)(((y - (1 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)(x / map.ChunkHeight));
+        AddChunk(map.ChunkWidth * (uint)(((y) / map.ChunkWidth)) + (uint)((x + (1 * map.ChunkSizeWidth)) / map.ChunkHeight));
+        AddChunk(map.ChunkWidth * (uint)(((y) / map.ChunkWidth)) + (uint)((x - (1 * map.ChunkSizeWidth)) / map.ChunkHeight));
 
-        var rightOne = (x + Map.ChunkSize) + y * Map.ChunkSize;
-        var rightTwo = (x + Map.DoubleChunkSize) + y * Map.ChunkSize;
+        //1 radius border around the plus
+        AddChunk(map.ChunkWidth * (uint)(((y + (2 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x) / map.ChunkHeight));
+        AddChunk(map.ChunkWidth * (uint)(((y - (2 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x) / map.ChunkHeight));
 
-        var upLeftOne = (x - Map.ChunkSize) + (y + Map.ChunkSize) * Map.ChunkSize;
-        var upRightOne = (x + Map.ChunkSize) + (y + Map.ChunkSize) * Map.ChunkSize;
+        AddChunk(map.ChunkWidth * (uint)(((y) / map.ChunkWidth)) + (uint)((x + (2 * map.ChunkSizeWidth)) / map.ChunkHeight));
+        AddChunk(map.ChunkWidth * (uint)(((y) / map.ChunkWidth)) + (uint)((x - (2 * map.ChunkSizeWidth)) / map.ChunkHeight));
 
-        var belowLeftOne = (x - Map.ChunkSize) + (y - Map.ChunkSize) * Map.ChunkSize;
-        var belowRightOne = (x + Map.ChunkSize) + (y - Map.ChunkSize) * Map.ChunkSize;
+        AddChunk(map.ChunkWidth * (uint)(((y + (1 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x + (1 * map.ChunkSizeWidth)) / map.ChunkHeight));
+        AddChunk(map.ChunkWidth * (uint)(((y + (1 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x - (1 * map.ChunkSizeWidth)) / map.ChunkHeight));
 
-        AddChunk(aboveOne);
-        AddChunk(aboveTwo);
-        AddChunk(belowOne);
-        AddChunk(belowTwo);
-        AddChunk(leftOne);
-        AddChunk(leftTwo);
-        AddChunk(rightOne);
-        AddChunk(rightTwo);
-        AddChunk(upLeftOne);
-        AddChunk(upRightOne);
-        AddChunk(belowLeftOne);
-        AddChunk(belowRightOne);
+        AddChunk(map.ChunkWidth * (uint)(((y - (1 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x + (1 * map.ChunkSizeWidth)) / map.ChunkHeight));
+        AddChunk(map.ChunkWidth * (uint)(((y - (1 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x - (1 * map.ChunkSizeWidth)) / map.ChunkHeight));
+
+        //Outer radius
+        AddChunk(map.ChunkWidth * (uint)(((y - (2 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x - (1 * map.ChunkSizeWidth)) / map.ChunkHeight));
+        AddChunk(map.ChunkWidth * (uint)(((y - (2 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x + (1 * map.ChunkSizeWidth)) / map.ChunkHeight));
+        AddChunk(map.ChunkWidth * (uint)(((y + (2 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x + (1 * map.ChunkSizeWidth)) / map.ChunkHeight));
+        AddChunk(map.ChunkWidth * (uint)(((y + (2 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x - (1 * map.ChunkSizeWidth)) / map.ChunkHeight));
+        AddChunk(map.ChunkWidth * (uint)(((y - (1 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x - (2 * map.ChunkSizeWidth)) / map.ChunkHeight));
+        AddChunk(map.ChunkWidth * (uint)(((y + (1 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x - (2 * map.ChunkSizeWidth)) / map.ChunkHeight));
+        AddChunk(map.ChunkWidth * (uint)(((y - (1 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x + (2 * map.ChunkSizeWidth)) / map.ChunkHeight));
+        AddChunk(map.ChunkWidth * (uint)(((y + (1 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x + (2 * map.ChunkSizeWidth)) / map.ChunkHeight));
+
+        //var aboveOne = World.Map.ChunkSize * x + (y + Map.ChunkSize);
+        //var aboveTwo = World.Map.ChunkSize * x + (y + Map.DoubleChunkSize);
+        //
+        //var belowOne = World.Map.ChunkSize * x + (y - Map.ChunkSize);
+        //var belowTwo = World.Map.ChunkSize * x + (y - Map.DoubleChunkSize);
+        //
+        //var leftOne = World.Map.ChunkSize * (x - Map.ChunkSize) + y;
+        //var leftTwo = World.Map.ChunkSize * (x - Map.DoubleChunkSize) + y;
+        //
+        //var rightOne = World.Map.ChunkSize * (x + Map.ChunkSize) + y;
+        //var rightTwo = World.Map.ChunkSize * (x + Map.DoubleChunkSize) + y;
+        //
+        //var upLeftOne = Map.ChunkSize * (x - Map.ChunkSize) + (y + Map.ChunkSize);
+        //var upRightOne = Map.ChunkSize * (x + Map.ChunkSize) + (y + Map.ChunkSize);
+        //
+        //var belowLeftOne = Map.ChunkSize * (x - Map.ChunkSize) + (y - Map.ChunkSize);
+        //var belowRightOne = Map.ChunkSize * (x + Map.ChunkSize) + (y - Map.ChunkSize);
+        //
+        //AddChunk(aboveOne);
+        //AddChunk(aboveTwo);
+        //AddChunk(belowOne);
+        //AddChunk(belowTwo);
+        //AddChunk(leftOne);
+        //AddChunk(leftTwo);
+        //AddChunk(rightOne);
+        //AddChunk(rightTwo);
+        //AddChunk(upLeftOne);
+        //AddChunk(upRightOne);
+        //AddChunk(belowLeftOne);
+        //AddChunk(belowRightOne);
 
         //Do not modify the chunks inside of NewChunks!
         Client.Tcp.EnqueueSend(new Tiles(NewChunks));
     }
-
     private void AddChunk(uint idx) {
         if(idx < 0 || idx >= VisibleChunks.Length) 
             return;

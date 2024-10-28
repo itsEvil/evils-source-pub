@@ -8,15 +8,19 @@ public sealed class WorldDesc {
     public readonly uint Difficulty;
     public readonly string FilePath;
     public readonly bool DisplayNames;
-    public readonly byte ChunkSize;
+    public readonly byte ChunkSizeWidth;
+    public readonly byte ChunkSizeHeight;
+    public readonly uint DefaultTile;
     public WorldDesc(XElement e, uint id, string name, string resourcePath) {
         UniqueId = id;
         Name = name;
-        Description = e.ParseString("Description", "");
+        Description = e.ParseString("Desc", "");
         Difficulty = e.ParseUInt("Difficulty");
-        ChunkSize = (byte)e.ParseUInt("ChunkSize", undefined: 8);
+        ChunkSizeWidth = (byte)e.ParseUInt("ChunkWidth", undefined: 8);
+        ChunkSizeHeight = (byte)e.ParseUInt("ChunkHeight", undefined: 8);
         DisplayNames = e.ParseBool("DisplayNames");
         FilePath = Path.Combine(resourcePath, e.ParseString("Path", ""));
+        DefaultTile = e.ParseUInt("DefaultTile", undefined: 0);
     }
     public bool TryGetMapData(out byte[] data) {
         data = [];

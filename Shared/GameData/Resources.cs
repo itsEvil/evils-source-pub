@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using Shared.Redis.Models;
+using System.Xml.Linq;
 
 namespace Shared.GameData;
 public sealed class Resources {
@@ -23,11 +24,15 @@ public sealed class Resources {
     public readonly Dictionary<uint, EnemyDesc> Id2Enemy = [];
     public readonly Dictionary<string, EnemyDesc> Name2Enemy = [];
 
+    public readonly Dictionary<string, WorldDesc> Name2Worlds = [];
+    public readonly Dictionary<uint, WorldDesc> Id2Worlds = [];
+
     public Resources(string resourcePath = "") {
         if (string.IsNullOrEmpty(resourcePath))
             throw new Exception("Resource path is null or empty");
 
         ParseFiles(resourcePath);
+        ParseWorldFiles(Path.Combine(resourcePath, "Worlds"));
     }
     private void ParseFiles(string path) {
         var files = Directory.GetFiles(path, "*.xml");
@@ -49,6 +54,30 @@ public sealed class Resources {
 
         }
     }
+
+    private void ParseWorldFiles(string path)
+    {
+        var files = Directory.GetFiles(path, "*.xml");
+        foreach (var file in files)
+        {
+            SLog.Debug("Parsing: {0}", args: [file]);
+
+            try
+            {
+                var text = File.ReadAllText(file);
+
+                var xml = XElement.Parse(text);
+
+                ParseWorlds(xml, path);
+            }
+            catch (Exception e)
+            {
+                SLog.Error("Error parsing: '{0}' {1} {2}", args: [file, e.Message, e.StackTrace]);
+            }
+
+        }
+    }
+
     private void ParseFile(XElement file) {
         foreach(var obj in file.Elements("Object")) {
             var className = obj.ParseString("Class");
@@ -67,6 +96,19 @@ public sealed class Resources {
 
 
             SLog.Debug("Parsed: {0} {1}", args: [desc.Name, desc.Id]);
+        }
+    }
+
+    private void ParseWorlds(XElement file, string path)
+    {
+        foreach (var world in file.Elements("World"))
+        {
+            var name = world.ParseString("@name", "unknown");
+            var id = world.ParseUInt("@id", false, 0);
+            WorldDesc desc = Name2Worlds[name] = Id2Worlds[id] = new WorldDesc(world, id, name, path);
+
+            SLog.Debug("Parsed: {0} {1} world \n\t at {2}", args: [name, id, desc.FilePath]);
+            //Load map data
         }
     }
 }
