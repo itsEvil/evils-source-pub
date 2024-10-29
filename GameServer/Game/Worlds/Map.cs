@@ -15,12 +15,15 @@ public sealed class Map {
     public Chunk[] Chunks = [];
     public readonly uint ChunkWidth;
     public readonly uint ChunkHeight;
-    public Map(uint width, uint height, byte chunkSizeWidth = 8, byte chunkSizeHeight = 8, uint initValue = 0) {
+    public readonly uint InitValue;
+    public Map(uint width, uint height, byte chunkSizeWidth = 8, byte chunkSizeHeight = 8, uint initValue = 0, bool createChunksArray = true) {
         Width = width;
         Height = height;
         ChunkSizeWidth = chunkSizeWidth;
         ChunkSizeHeight = chunkSizeHeight;
 
+        InitValue = initValue;
+        
         ChunkWidth = Width / ChunkSizeWidth;
         ChunkHeight = Height / ChunkSizeHeight;
 
@@ -28,7 +31,10 @@ public sealed class Map {
             ChunkWidth += 1;
         if(Height % ChunkSizeWidth != 0)
             ChunkWidth += 1;
-        
+
+        if (!createChunksArray)
+            return;
+
         Chunks = new Chunk[ChunkWidth * ChunkHeight];
         for (uint x = 0; x < ChunkWidth; x++)
             for(uint y = 0; y < ChunkHeight; y++)
@@ -57,5 +63,13 @@ public sealed class Map {
     public Chunk this[uint x, uint y]
     {
         get => GetChunk(x, y);
+    }
+    public Map Clone() {
+        var map = new Map(Width, Height, ChunkSizeWidth, ChunkSizeHeight, InitValue, false)
+        {
+            Chunks = [.. Chunks]
+        };
+
+        return map;
     }
 }

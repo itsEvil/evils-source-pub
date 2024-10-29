@@ -1,0 +1,48 @@
+﻿@page "/servers"
+@using Shared.Redis.Models
+@attribute [StreamRendering]
+
+<PageTitle>Servers</PageTitle>
+
+<h1>Servers</h1>
+
+@if (servers == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Server</th>
+                <th>Type</th>
+                <th>Address</th>
+                <th>Population</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var server in servers)
+            {
+                <tr>
+                    <td>@server.Name</td>
+                    <td>@server.ServerType</td>
+                    <td>@server.IPAddress : @server.Port</td>
+                    <td>@server.Population / @server.MaxPopulation</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Server>? servers = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate streaming rendering
+        await Task.Delay(500);
+
+        servers = Program.Redis.Servers;
+    }
+}

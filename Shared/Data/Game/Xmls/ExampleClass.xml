@@ -1,0 +1,17 @@
+﻿<Objects>
+	<!-- 
+		*** Inventory ***
+	Filled with items starting from top to bottom 
+	If size is greater then items provided then 
+	the rest of the slots will be filled with 
+	copies of item from the empty attribute
+	-->
+	
+	
+	<Class id="1" name="Example Class">
+		<CharacterTexture name="wizard"/>
+		<Inventory size="20" empty="1" emptyStack="0">
+			<Item id="200" stack="1"/>
+		</Inventory>
+	</Class>
+</Objects>

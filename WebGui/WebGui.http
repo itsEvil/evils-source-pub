@@ -1,0 +1,11 @@
+@WebGui_HostAddress = https://localhost:6969
+
+GET {{WebGui_HostAddress}}/weather
+Accept: text/html
+
+###
+
+GET {{WebGui_HostAddress}}/counter
+Accept: text/html
+
+###

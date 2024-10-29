@@ -16,5 +16,5 @@ public class AppOptions {
     public string Address = "127.0.0.1";
 
     public Redis Redis = new();
-    public Resources Resources = new("Data", "Game", "Web");
+    public ResourcesOptions Resources = new("Data", "Game", "Web");
 }

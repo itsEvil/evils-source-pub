@@ -2,15 +2,23 @@
 
 namespace Shared.GameData;
 public sealed class WorldDesc {
+    public static readonly WorldDesc Empty = new();
+
+
     public readonly uint UniqueId;
-    public readonly string Name;
-    public readonly string Description;
+    public readonly string Name = "Empty";
+    public readonly string Description = "";
     public readonly uint Difficulty;
-    public readonly string FilePath;
+    public readonly string FilePath = "";
     public readonly bool DisplayNames;
     public readonly byte ChunkSizeWidth;
     public readonly byte ChunkSizeHeight;
     public readonly uint DefaultTile;
+
+    public readonly bool Template;
+    public readonly bool IsEmpty;
+    
+    public WorldDesc() { IsEmpty = true; }
     public WorldDesc(XElement e, uint id, string name, string resourcePath) {
         UniqueId = id;
         Name = name;
@@ -19,6 +27,7 @@ public sealed class WorldDesc {
         ChunkSizeWidth = (byte)e.ParseUInt("ChunkWidth", undefined: 8);
         ChunkSizeHeight = (byte)e.ParseUInt("ChunkHeight", undefined: 8);
         DisplayNames = e.ParseBool("DisplayNames");
+        Template = e.ParseBool("Template");
         FilePath = Path.Combine(resourcePath, e.ParseString("Path", ""));
         DefaultTile = e.ParseUInt("DefaultTile", undefined: 0);
     }

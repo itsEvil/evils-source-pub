@@ -1,11 +1,11 @@
 ﻿using Shared;
 
 namespace GameServer.Core.Options;
-public sealed class Resources{
+public sealed class ResourcesOptions {
     public string DataPath;
     public string GameDataPath;
     public string WebDataPath;
-    public Resources(string data, string gameData, string webData) {
+    public ResourcesOptions(string data, string gameData, string webData) {
         var cur = Directory.GetCurrentDirectory();
         DataPath = data;
         GameDataPath = Path.Combine(cur, DataPath, gameData);

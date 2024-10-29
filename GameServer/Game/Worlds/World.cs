@@ -4,6 +4,8 @@ using Shared.GameData;
 using System.Numerics;
 namespace GameServer.Game.Worlds;
 public class World {
+    private static readonly World Empty = new(uint.MaxValue, WorldDesc.Empty, true);
+
     public readonly Dictionary<uint, Entity> Entities = []; 
     public readonly Dictionary<uint, Player> Players = [];
 
@@ -17,13 +19,19 @@ public class World {
     private readonly List<Task> PlayerUpdates = new List<Task>(128);
 
     public readonly uint Id;
-    public readonly Map Map;
     public readonly WorldDesc Desc;
-    public World(uint worldId, WorldDesc worldDesc) {
+    public readonly bool IsEmpty = false;
+    public Map Map;
+    public World(uint worldId, WorldDesc worldDesc, bool isEmpty = false) {
         Id = worldId;
         Desc = worldDesc;
+        IsEmpty = isEmpty;
+    }
 
-        Map = new Map(1024, 1024, worldDesc.ChunkSizeWidth, worldDesc.ChunkSizeHeight, worldDesc.DefaultTile);
+    public virtual void Init(Map map) {
+        //Map = new Map(1024, 1024, Desc.ChunkSizeWidth, Desc.ChunkSizeHeight, Desc.DefaultTile);
+
+        Map = map.Clone(); //Clone the original so we don't modify it for other worlds.
     }
 
     public void Enter(Entity entity, Vector2 at) {

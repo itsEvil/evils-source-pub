@@ -1,0 +1,80 @@
+﻿@page "/worlds"
+@using Shared.Redis.Models
+@attribute [StreamRendering]
+
+<PageTitle>Worlds</PageTitle>
+
+<h1>Worlds</h1>
+
+@if (ServerToWorld == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @foreach (var (server, worlds) in ServerToWorld)
+    {
+        <h1>Server: @server</h1>
+        if(worlds is null || worlds.Length == 0) {
+            <p>No worlds...</p>
+            continue;
+        }
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>World</th>
+                    <th>Id</th>
+                    <th>Population</th>
+                    <th>Entities</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var world in worlds)
+                {
+                <tr>
+                    <td>@world.Name</td>
+                    <td>@world.Id</td>
+                    <td>@world.Population</td>
+                    <td>@world.Entities</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    private Dictionary<string, WorldData[]>? ServerToWorld = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        ServerToWorld ??= [];
+        ServerToWorld.Clear();
+
+        var servers = Program.Redis.GameServers;
+        foreach(var server in servers)
+        {
+            if(!ServerToWorld.TryGetValue(server.Name, out var worlds))
+            {
+                worlds = await GetWorldDataAsync(server);
+                ServerToWorld[server.Name] = worlds;
+            }
+        }
+    }
+
+    private async Task<WorldData[]> GetWorldDataAsync(Server server)
+    {
+
+
+        return await Task.FromResult(Array.Empty<WorldData>());
+    }
+
+    private class WorldData
+    {
+        public string Name = "Unknown";
+        public uint Id;
+        public uint Population;
+        public uint Entities;
+    }
+}

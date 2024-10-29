@@ -1,17 +1,41 @@
 ﻿<Objects>
+
+	<!-- Objects -->
+	
 	<Object id="0" name="Empty Object">
 		<Class>GameObject</Class>
 	</Object>
-	<Object id="1" name="Empty Item">
-		<Class>Item</Class>
-	</Object>
-	<Object id="2" name="Empty Player">
-		<Class>Player</Class>
-	</Object>
-	<Object id="3" name="Empty Projectile">
-		<Class>Projectile</Class>
-	</Object>
-	<Object id="4" name="Empty Enemy">
-		<Class>Enemy</Class>
-	</Object>
+
+	<!-- Items -->
+
+	<Item id="0" name="Empty Item">
+		
+	</Item>
+
+	<!-- Classes -->
+	
+	<Class id="0" name="Empty Class">
+		
+	</Class>
+
+	<!-- Projectiles -->
+	
+	<Projectile id="0" name="Empty Projectile">
+		
+	</Projectile>
+	
+	<!-- Characters -->
+	
+	<Character id="0" name="Empty Character">
+		
+	</Character>
+	
+	<Character id="1" name="Enemy">
+		<Enemy/>
+	</Character>
+	
+	<Character id="2" name="NPC">
+		
+	</Character>
+	
 </Objects>

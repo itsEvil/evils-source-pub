@@ -26,10 +26,18 @@ public sealed class RedisDb {
         if (!string.IsNullOrWhiteSpace(password))
             conString += ",password=" + password;
 
-        Redis = ConnectionMultiplexer.Connect(conString);
-        Server = Redis.GetServer(Redis.GetEndPoints(true)[0]);
-        Database = Redis.GetDatabase(index);
-        Sub = Redis.GetSubscriber();
+        try
+        {
+            Redis = ConnectionMultiplexer.Connect(conString);
+            Server = Redis.GetServer(Redis.GetEndPoints(true)[0]);
+            Database = Redis.GetDatabase(index);
+            Sub = Redis.GetSubscriber();
+        }
+        catch(Exception e) {
+            SLog.Error(e);
+            SLog.Error("Failed to init RedisDb, is redis_server.exe running?");
+            return;
+        }
 
         SLog.Info("Connected to redis at [{0}:{1}]", args: [host, port]);
         LoadGlobals();
