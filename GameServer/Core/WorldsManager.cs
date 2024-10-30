@@ -2,6 +2,7 @@
 using GameServer.Game.Worlds;
 using Shared;
 using Shared.GameData;
+using System.Runtime.InteropServices;
 
 namespace GameServer.Core;
 public sealed class WorldsManager {
@@ -19,8 +20,8 @@ public sealed class WorldsManager {
         if(!m_Converted.TryGetValue(desc, out var map))
         {
             //Write a basic map for testing
-            //var mapData = CreateMapData(new Map(128, 128, 8, 8, 0, false));
-            //File.WriteAllBytes(desc.FilePath, mapData.ToArray());
+            var mapData = CreateMapData(new Map(128, 128, 8, 8, 0, false));
+            File.WriteAllBytes(desc.FilePath, mapData.ToArray());
 
 
             if(!desc.TryGetMapData(out var data))
@@ -35,8 +36,12 @@ public sealed class WorldsManager {
         }
 
         World world;
-        if (desc.Template)
+        if (desc.Template) {
             world = new World(GetNextWorldId(), desc);
+            Worlds[world.Id] = world;
+            world.Init(m_Converted[desc]);
+            return world;
+        }
 
         if (!Worlds.TryGetValue(desc.UniqueId, out world))
         {
@@ -79,25 +84,10 @@ public sealed class WorldsManager {
 
         var chunkWidth = r.Byte(b);
         var chunkHeight = r.Byte(b);
-        
         var initValue = r.UInt(b);
 
         var map = new Map(width, height, chunkWidth, chunkHeight, initValue, true);
 
         return map;
-    }
-    private static Span<byte> CreateMapData(Map map) {
-        var w = new Writer();
-        w.Reset();
-        var array = new byte[512];
-        var b = array.AsSpan();
-
-        w.Write(b, map.Width);
-        w.Write(b, map.Height);
-        w.Write(b, map.ChunkSizeWidth);
-        w.Write(b, map.ChunkSizeHeight);
-        w.Write(b, map.InitValue);
-
-        return b[0..w.Position];
     }
 }

@@ -2,26 +2,30 @@
 using Shared;
 using Shared.GameData;
 using System.Numerics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 namespace GameServer.Game.Worlds;
-public class World {
-    private static readonly World Empty = new(uint.MaxValue, WorldDesc.Empty, true);
+public class World : IDisposable
+{
+    [JsonIgnore] private static readonly World Empty = new(uint.MaxValue, WorldDesc.Empty, true);
 
-    public readonly Dictionary<uint, Entity> Entities = []; 
-    public readonly Dictionary<uint, Player> Players = [];
+    [JsonIgnore] public readonly Dictionary<uint, Entity> Entities = []; 
+    [JsonIgnore] public readonly Dictionary<uint, Player> Players = [];
 
-    private readonly List<Entity> ToAddEntity = [];
-    private readonly List<uint> ToRemoveEntity = [];
+    [JsonIgnore] private readonly List<Entity> ToAddEntity = [];
+    [JsonIgnore] private readonly List<uint> ToRemoveEntity = [];
 
-    private readonly List<Player> ToAddPlayer = [];
-    private readonly List<uint> ToRemovePlayer = [];
+    [JsonIgnore] private readonly List<Player> ToAddPlayer = [];
+    [JsonIgnore] private readonly List<uint> ToRemovePlayer = [];
 
-    private readonly List<Task> EntityUpdates = new List<Task>(256);
-    private readonly List<Task> PlayerUpdates = new List<Task>(128);
-
+    [JsonIgnore] private readonly List<Task> EntityUpdates = new List<Task>(256);
+    [JsonIgnore] private readonly List<Task> PlayerUpdates = new List<Task>(128);
+    
     public readonly uint Id;
     public readonly WorldDesc Desc;
     public readonly bool IsEmpty = false;
-    public Map Map;
+
+    [JsonIgnore] public Map Map;
     public World(uint worldId, WorldDesc worldDesc, bool isEmpty = false) {
         Id = worldId;
         Desc = worldDesc;
@@ -131,4 +135,15 @@ public class World {
     protected virtual void Update() { }
     private uint NextId = int.MaxValue;
     public uint GetNextId() => NextId++;
+
+    public static string ToRedis(World world) {
+        return JsonSerializer.Serialize(world, JsonCache.Options);
+    }
+    public static World FromRedis(string json) {
+        return JsonSerializer.Deserialize<World>(json, JsonCache.Options);
+    }
+    public void Dispose()
+    {
+        
+    }
 }

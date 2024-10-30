@@ -1,5 +1,7 @@
 ﻿using Shared;
+using Shared.GameData;
 using Shared.Interfaces;
+using System.Runtime.InteropServices;
 
 namespace GameServer.Game.Worlds;
 public sealed class Chunk : IWriteable {
@@ -26,17 +28,6 @@ public sealed class Chunk : IWriteable {
             }
         }
     }
-	public Chunk(Reader r, Span<byte> b) {
-        Width = r.Byte(b);
-        Height = r.Byte(b);
-        X = r.UInt(b);
-        Y = r.UInt(b);
-        var len = r.UShort(b);
-        Tiles = new uint[len];
-
-        for (int i = 0; i < Tiles.Length; i++)
-            Tiles[i] = r.UInt(b);
-    }
     public uint this[uint x, uint y] {
         get => Get(x,y);
         set => Set(x,y, value);
@@ -57,7 +48,6 @@ public sealed class Chunk : IWriteable {
 
         Tiles[Width * x + y] = value;
     }
-
     public void Write(Writer w, Span<byte> b)
     {
 		w.Write(b, Width);
@@ -65,12 +55,42 @@ public sealed class Chunk : IWriteable {
         w.Write(b, X);
         w.Write(b, Y);
         w.Write(b, (ushort)Tiles.Length);
-
         //Maybe pre generate the bytes from these tiles on creation/change of chunk
         //and just copy them to the array as that might be much faster
 
         //Or copy them with a unsafe method im sure thats also possible
         for (int i = 0; i < Tiles.Length; i++)
             w.Write(b, Tiles[i]);
+
+    }
+    public static int GetSize(Chunk chunk) {
+        const int uintSize = sizeof(uint);
+        const int byteSize = sizeof(byte);
+        const int ushortSize = sizeof(ushort);
+        const int total = uintSize + uintSize + byteSize + byteSize + ushortSize; //Chunk + TilesArray
+        int tileSize = chunk.Width * chunk.Height * uintSize;
+
+        return total + tileSize;
+    }
+
+    public void WriteToDisk(Writer w, Span<byte> b) {
+        w.Write(b, X);
+        w.Write(b, Y);
+        w.Write(b, (ushort)Tiles.Length);
+        //Maybe pre generate the bytes from these tiles on creation/change of chunk
+        //and just copy them to the array as that might be much faster
+
+        //Or copy them with a unsafe method im sure thats also possible
+        for (int i = 0; i < Tiles.Length; i++)
+            w.Write(b, Tiles[i]);
+    }
+    public Chunk(Reader r, Span<byte> b, byte width, byte height) {
+        X = r.UInt(b);
+        Y = r.UInt(b);
+        var len = r.UShort(b);
+        Tiles = new uint[len];
+
+        for (int i = 0; i < Tiles.Length; i++)
+            Tiles[i] = r.UInt(b);
     }
 }
