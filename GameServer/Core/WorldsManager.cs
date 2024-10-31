@@ -20,9 +20,15 @@ public sealed class WorldsManager {
         if(!m_Converted.TryGetValue(desc, out var map))
         {
             //Write a basic map for testing
-            var mapData = CreateMapData(new Map(128, 128, 8, 8, 0, false));
+            /* 
+            var mapData = Map.WriteMapToBuffer(new Map(
+#if DEBUG
+                desc,
+#endif       
+                128, 128, 8, 8, 0));
+            
             File.WriteAllBytes(desc.FilePath, mapData.ToArray());
-
+            */
 
             if(!desc.TryGetMapData(out var data))
             {
@@ -30,7 +36,14 @@ public sealed class WorldsManager {
                 return null;
             }
 
-            map = ConvertDataToMap(data);
+            var r = new Reader();
+            map = new Map(
+#if DEBUG
+                desc,
+#endif       
+                r, data);
+
+            SLog.Debug("Converted map from disk with {0} chunks and {1} region lists", args: [map.Chunks.Length, map.Regions.Count]);
 
             m_Converted[desc] = map;
         }
@@ -73,21 +86,5 @@ public sealed class WorldsManager {
     private uint GetNextWorldId() {
         NextWorldId -= 1;
         return NextWorldId;
-    }
-    private static Map ConvertDataToMap(byte[] mapData) {
-        var r = new Reader();
-        r.Reset(mapData.Length);
-        var b = mapData.AsSpan();
-
-        var width = r.UInt(b);
-        var height = r.UInt(b);
-
-        var chunkWidth = r.Byte(b);
-        var chunkHeight = r.Byte(b);
-        var initValue = r.UInt(b);
-
-        var map = new Map(width, height, chunkWidth, chunkHeight, initValue, true);
-
-        return map;
     }
 }

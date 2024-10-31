@@ -24,9 +24,12 @@ public sealed class Writer
         {
             Position++;
 #if DEBUG
-            SLog.Error("Send buffer attempted to read out of bounds {0}, {1}", args: [Position, buffer.Length]);
-#endif
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
+            SLog.Error(ex);
+            throw ex;
+#else
             return;
+#endif
         }
 
         buffer[Position++] = value;
@@ -44,9 +47,12 @@ public sealed class Writer
         {
             Position += ShortLen;
 #if DEBUG
-            SLog.Error("Send buffer attempted to read out of bounds {0}, {1}", args: [Position, buffer.Length]);
-#endif
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
+            SLog.Error(ex);
+            throw ex;
+#else
             return;
+#endif
         }
 
         BinaryPrimitives.WriteInt16BigEndian(buffer[Position..], value);
@@ -61,9 +67,12 @@ public sealed class Writer
         {
             Position += ShortLen;
 #if DEBUG
-            SLog.Error("Send buffer attempted to read out of bounds {0}, {1}", args: [Position, buffer.Length]);
-#endif
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
+            SLog.Error(ex);
+            throw ex;
+#else
             return;
+#endif
         }
 
         BinaryPrimitives.WriteUInt16BigEndian(buffer[Position..], value);
@@ -78,9 +87,12 @@ public sealed class Writer
         {
             Position += IntLen;
 #if DEBUG
-            SLog.Error("Send buffer attempted to read out of bounds {0}, {1}", args: [Position, buffer.Length]);
-#endif
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
+            SLog.Error(ex);
+            throw ex;
+#else
             return;
+#endif
         }
 
         BinaryPrimitives.WriteInt32BigEndian(buffer[Position..], value);
@@ -95,9 +107,12 @@ public sealed class Writer
         {
             Position += IntLen;
 #if DEBUG
-            SLog.Error("Send buffer attempted to read out of bounds {0}, {1}", args: [Position, buffer.Length]);
-#endif
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
+            SLog.Error(ex);
+            throw ex;
+#else
             return;
+#endif
         }
 
         BinaryPrimitives.WriteUInt32BigEndian(buffer[Position..], value);
@@ -112,9 +127,12 @@ public sealed class Writer
         {
             Position += LongLen;
 #if DEBUG
-            SLog.Error("Send buffer attempted to read out of bounds {0}, {1}", args: [Position, buffer.Length]);
-#endif
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
+            SLog.Error(ex);
+            throw ex;
+#else
             return;
+#endif
         }
 
         BinaryPrimitives.WriteInt64BigEndian(buffer[Position..], value);
@@ -129,9 +147,12 @@ public sealed class Writer
         {
             Position += LongLen;
 #if DEBUG
-            SLog.Error("Send buffer attempted to read out of bounds {0}, {1}", args: [Position, buffer.Length]);
-#endif
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
+            SLog.Error(ex);
+            throw ex;
+#else
             return;
+#endif
         }
 
         BinaryPrimitives.WriteUInt64BigEndian(buffer[Position..], value);
@@ -146,9 +167,12 @@ public sealed class Writer
         {
             Position += IntLen;
 #if DEBUG
-            SLog.Error("Send buffer attempted to read out of bounds {0}, {1}", args: [Position, buffer.Length]);
-#endif
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
+            SLog.Error(ex);
+            throw ex;
+#else
             return;
+#endif
         }
 
         var bytes = BitConverter.GetBytes(value);
@@ -168,9 +192,12 @@ public sealed class Writer
         {
             Position += LongLen;
 #if DEBUG
-            SLog.Error("Send buffer attempted to read out of bounds {0}, {1}", args: [Position, buffer.Length]);
-#endif
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
+            SLog.Error(ex);
+            throw ex;
+#else
             return;
+#endif
         }
 
 
@@ -196,9 +223,12 @@ public sealed class Writer
         if (bytes.Length <= 0)
         {
 #if DEBUG
-            SLog.Error("String length is Zero", args: []);
-#endif
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
+            SLog.Error(ex);
+            throw ex;
+#else
             return;
+#endif
         }
 
 
@@ -206,9 +236,12 @@ public sealed class Writer
         {
             Position += bytes.Length;
 #if DEBUG
-            SLog.Error("Send buffer attempted to read out of bounds {0}, {1}", args: [Position, buffer.Length]);
-#endif
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
+            SLog.Error(ex);
+            throw ex;
+#else
             return;
+#endif
         }
 
         bytes.CopyTo(buffer[Position..]);
@@ -224,9 +257,12 @@ public sealed class Writer
         if (bytes.Length <= 0)
         {
 #if DEBUG
-            SLog.Error("String length is Zero", args: []);
-#endif
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
+            SLog.Error(ex);
+            throw ex;
+#else
             return;
+#endif
         }
 
 
@@ -234,9 +270,12 @@ public sealed class Writer
         {
             Position += bytes.Length;
 #if DEBUG
-            SLog.Error("Send buffer attempted to read out of bounds {0}, {1}", args: [Position, buffer.Length]);
-#endif
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
+            SLog.Error(ex);
+            throw ex;
+#else
             return;
+#endif
         }
 
         bytes.CopyTo(buffer[Position..]);

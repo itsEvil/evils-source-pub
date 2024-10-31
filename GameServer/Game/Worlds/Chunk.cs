@@ -65,10 +65,9 @@ public sealed class Chunk : IWriteable {
     }
     public static int GetSize(Chunk chunk) {
         const int uintSize = sizeof(uint);
-        const int byteSize = sizeof(byte);
         const int ushortSize = sizeof(ushort);
-        const int total = uintSize + uintSize + byteSize + byteSize + ushortSize; //Chunk + TilesArray
-        int tileSize = chunk.Width * chunk.Height * uintSize;
+        const int total = uintSize + uintSize + ushortSize; //X,Y, (ushort)Tiles.Length
+        int tileSize = chunk.Tiles.Length * uintSize;
 
         return total + tileSize;
     }
@@ -85,6 +84,8 @@ public sealed class Chunk : IWriteable {
             w.Write(b, Tiles[i]);
     }
     public Chunk(Reader r, Span<byte> b, byte width, byte height) {
+        Width = width;
+        Height = height;
         X = r.UInt(b);
         Y = r.UInt(b);
         var len = r.UShort(b);

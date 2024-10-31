@@ -10,7 +10,9 @@ using System.Threading.Tasks;
 namespace GameServer.Game.Worlds;
 public sealed class Map {
 
-    public readonly Dictionary<Vector2Byte, List<Region>> Regions = []; //Allows for multiple regions on top of eachother
+    public readonly Dictionary<Region, List<Vector2UInt>> Regions = [];
+
+    //public readonly Dictionary<Vector2Byte, List<Region>> Regions = []; //Allows for multiple regions on top of eachother
 
     public readonly byte ChunkSizeWidth;
     public readonly byte ChunkSizeHeight;
@@ -22,7 +24,18 @@ public sealed class Map {
     public readonly uint ChunkWidth;
     public readonly uint ChunkHeight;
     public readonly uint InitValue;
-    public Map(uint width, uint height, byte chunkSizeWidth = 8, byte chunkSizeHeight = 8, uint initValue = 0, bool createChunksArray = true) {
+#if DEBUG
+    public readonly WorldDesc Descriptor;
+#endif
+    public Map(
+#if DEBUG
+        WorldDesc desc,
+#endif
+        uint width, uint height, byte chunkSizeWidth = 8, byte chunkSizeHeight = 8, uint initValue = 0, bool createChunksArray = true) {  
+#if DEBUG
+        Descriptor = desc;
+#endif
+
         Width = width;
         Height = height;
         ChunkSizeWidth = chunkSizeWidth;
@@ -70,8 +83,16 @@ public sealed class Map {
     {
         get => GetChunk(x, y);
     }
-    public Map Clone() {
-        var map = new Map(Width, Height, ChunkSizeWidth, ChunkSizeHeight, InitValue, false)
+    public Map Clone(
+#if DEBUG
+        WorldDesc desc
+#endif
+        ) {
+        var map = new Map(
+#if DEBUG
+            desc
+#endif   
+            ,Width, Height, ChunkSizeWidth, ChunkSizeHeight, InitValue, false)
         {
             Chunks = [.. Chunks]
         };
@@ -79,7 +100,7 @@ public sealed class Map {
         return map;
     }
 
-    public void AddRegion(Vector2Byte position, Region region)
+    public void AddRegion(Vector2UInt position, Region region)
     {
         if (position.X < 0 || position.X > Width || position.Y < 0 || position.Y > Height)
         {
@@ -87,15 +108,15 @@ public sealed class Map {
             return;
         }
 
-        if (!Regions.TryGetValue(position, out var regions))
+        if (!Regions.TryGetValue(region, out var positions))
         {
-            regions = [];
-            Regions[position] = regions;
+            positions = [];
+            Regions[region] = positions;
         }
 
-        regions.Add(region);
+        positions.Add(position);
     }
-    public bool RemoveRegion(Vector2Byte position, Region region)
+    public bool RemoveRegion(Vector2UInt position, Region region)
     {
         if (position.X < 0 || position.X > Width || position.Y < 0 || position.Y > Height)
         {
@@ -103,13 +124,19 @@ public sealed class Map {
             return false;
         }
 
-        if (!Regions.TryGetValue(position, out var regions))
+        if (!Regions.TryGetValue(region, out var positions))
         {
             SLog.Debug("Region at {0} not found", args: [position.ToString()]);
             return false;
         }
 
-        return regions.Remove(region);
+        if (!positions.Remove(position))
+        {
+            SLog.Debug("Failed to find position {0} in {1} regions list", args: [position.ToString(),  region]);
+            return false;
+        }
+
+        return true;
     }
 
     public void Write(Writer w, Span<byte> b)
@@ -120,23 +147,33 @@ public sealed class Map {
         w.Write(b, ChunkSizeHeight);
         w.Write(b, InitValue);
 
-        w.Write(b, Regions.Count);
-        foreach(var (pos, regions) in Regions) {
-            w.Write(b, pos.X);
-            w.Write(b, pos.Y);
-            w.Write(b, (ushort)regions.Count);
+        w.Write(b, (ushort)Regions.Count);
+        foreach(var (region, positions) in Regions) {
+            w.Write(b, (ushort)region);
+            w.Write(b, (ushort)positions.Count);
 
-            var span = CollectionsMarshal.AsSpan(regions);
-            for (int i = 0; i < span.Length; i++)
-                w.Write(b, (ushort)span[i]);
+            var span = CollectionsMarshal.AsSpan(positions);
+            for (int i = 0; i < span.Length; i++) {
+                var item = span[i];
+                w.Write(b, item.X);
+                w.Write(b, item.Y);
+            }
         }
 
         for(uint x = 0; x < ChunkWidth; x++)
             for(uint y = 0; y < ChunkHeight; y++)
-                Chunks[ChunkWidth * x + y].Write(w, b);
+                Chunks[ChunkWidth * x + y].WriteToDisk(w, b);
     }
-    public Map(Reader r, Span<byte> b) {
+    public Map(
+#if DEBUG
+        WorldDesc desc,
+#endif
+        Reader r, Span<byte> b) {
         r.Reset(b.Length);
+
+#if DEBUG
+        Descriptor = desc;
+#endif
 
         Width = r.UInt(b);
         Height = r.UInt(b);
@@ -152,6 +189,27 @@ public sealed class Map {
             ChunkWidth += 1;
         if (Height % ChunkSizeHeight != 0)
             ChunkHeight += 1;
+
+        var regionCount = r.UShort(b);
+        for(int i = 0; i < regionCount; i++) {
+            Region region = (Region)r.UShort(b);
+            var count = r.UShort(b);
+            if(count > 0) {
+                List<Vector2UInt> positions = [];
+                for(int pi = 0; pi < count; pi++)
+                    positions.Add(new(r.UInt(b), r.UInt(b)));
+                
+                Regions[region] = positions;
+            }
+        }
+
+#if DEBUG
+        if(regionCount <= 0)
+        {
+            SLog.Warn("Loaded map with '{0}' regions by '{1}'", args: [regionCount, Descriptor.Name]);
+        }
+#endif
+
 
         Chunks = new Chunk[ChunkWidth * ChunkHeight];
         for (uint x = 0; x < ChunkWidth; x++)
@@ -179,7 +237,7 @@ public sealed class Map {
     {
         const int uintSize = sizeof(uint);
         const int byteSize = sizeof(byte);
-        const int ushortSize = sizeof(byte);
+        const int ushortSize = sizeof(ushort);
 
         const int defaultValuesSize = uintSize + uintSize + byteSize + byteSize + uintSize; //width, height, chunkWidth, chunkHeight, InitValue
 
@@ -188,18 +246,16 @@ public sealed class Map {
             throw new Exception("Cannot save map without chunks.");
         }
 
-        var chunksLength = map.Chunks.Length;
-
-        var totalChunkSize = chunksLength * Chunk.GetSize(map.Chunks[0]);
+        var totalChunkSize = map.Chunks.Length * Chunk.GetSize(map.Chunks[0]);
 
 
-        const int regionLocationSize = byteSize + byteSize + ushortSize;
-        
+        //const int regionLocationSize = uintSize + uintSize + ushortSize;
+        const int uintSize2 = (uintSize * 2);
         int regionSize = ushortSize;
-        foreach(var (_, regions) in map.Regions)
+        foreach(var (_, positions) in map.Regions)
         {
-            regionSize += regionLocationSize;
-            regionSize += ushortSize * regions.Count;
+            regionSize += ushortSize + ushortSize; //Region type and Positions length
+            regionSize += uintSize2 * positions.Count;
         }
 
         return defaultValuesSize + totalChunkSize + regionSize;

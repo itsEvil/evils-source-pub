@@ -29,7 +29,7 @@ public static class Worlds {
 
         var key = sb.ToString();
 
-        db.HashSet("worlds", key, world.ToRedis());
+        db.HashSet("worlds", key, World.ToRedis(world));
         db.HashFieldExpireAsync("worlds", [key], TimeSpan.FromMinutes(60));
     }
     public static void Update(IDatabase db, Server server, World world, WorldsAction action = WorldsAction.UpdateTimer)

@@ -35,7 +35,11 @@ public class World : IDisposable
     public virtual void Init(Map map) {
         //Map = new Map(1024, 1024, Desc.ChunkSizeWidth, Desc.ChunkSizeHeight, Desc.DefaultTile);
 
-        Map = map.Clone(); //Clone the original so we don't modify it for other worlds.
+        Map = map.Clone(
+#if DEBUG
+            Desc
+#endif   
+            ); //Clone the original so we don't modify it for other worlds.
     }
 
     public void Enter(Entity entity, Vector2 at) {
@@ -65,9 +69,15 @@ public class World : IDisposable
         return true;
     }
 
-    public Vector2 GetSpawnPoint()
-    {
-        return new Vector2(0, 0);
+    public Vector2 GetSpawnPoint() {
+        //Get a random spawn point from list of spawn points
+        if(Map.Regions.TryGetValue(Region.Spawn, out var points)) {
+            var point = points[Random.Shared.Next(0, points.Count)];
+            return new Vector2(point.X, point.Y);
+        }
+
+        //Or spawn in the middle of the map if it doesn't exist
+        return new Vector2(Map.Width / 2, Map.Height / 2);
     }
 
     private void Add()
