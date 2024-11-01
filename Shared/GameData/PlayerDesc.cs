@@ -62,7 +62,7 @@ public sealed class PlayerDesc : ObjectDesc
         for (int i = 0; i < Stats.Length; i++)
             StatValues[i] = Stats[i].Value;
     }
-    private StatsDesc[] ParseStats(XElement e) {
+    private static StatsDesc[] ParseStats(XElement e) {
         var size = e.ParseUInt("@size");
         if(size == 0)
             return [];
@@ -76,7 +76,7 @@ public sealed class PlayerDesc : ObjectDesc
             stats[stat.Index] = stat;
         }
 
-        return new StatsDesc[size];
+        return stats;
     }
     private static ItemData[] ParseInventory(XElement e)
     {

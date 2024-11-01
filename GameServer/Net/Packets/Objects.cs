@@ -2,16 +2,17 @@
 using GameServer.Net.Interfaces;
 using Shared.Interfaces;
 using System.Numerics;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace GameServer.Net.Packets;
-public readonly struct Objects(ObjectInfo[] newObjects) : ISend {
+public readonly struct Objects(List<ObjectInfo> newObjects) : ISend {
     public ushort Id => (ushort)S2C.Objects;
-    private readonly ObjectInfo[] NewObjects = newObjects;
+    private readonly List<ObjectInfo> NewObjects = newObjects;
     public void Write(Writer w, Span<byte> b) {
-        w.Write(b, (ushort)NewObjects.Length);
-        var span = NewObjects.AsSpan();
-        for(int i = 0; i < NewObjects.Length; i++)
-            span[i].Write(w, b);
+        w.Write(b, (ushort)NewObjects.Count);
+
+        for(int i = 0; i < NewObjects.Count; i++)
+            NewObjects[i].Write(w, b);
     }
 }
 

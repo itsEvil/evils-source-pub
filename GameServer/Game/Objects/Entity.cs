@@ -61,7 +61,7 @@ public class Entity {
         Export(Stats);
     }
 
-    public Task Tick() {
+    public virtual Task Tick() {
         //Tick behaviours
         //Tick inherited
         PreExport();
@@ -76,7 +76,14 @@ public class Entity {
         World = world;
         OnEnterWorld(world);
     }
+    public void Leave(World world) {
+        World = null;
+        Stats.Clear();
+        Effects.Clear();
+    }
+
     protected virtual void OnEnterWorld(World world) { }
+    protected virtual void OnLeaveWorld(World world) { }
     private void InitEffects()
     {
         var span = Shared.GameData.Effects.Array.AsSpan();

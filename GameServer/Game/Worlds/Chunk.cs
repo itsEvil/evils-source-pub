@@ -1,10 +1,16 @@
-﻿using Shared;
+﻿using GameServer.Game.Objects;
+using Shared;
 using Shared.GameData;
 using Shared.Interfaces;
 using System.Runtime.InteropServices;
 
 namespace GameServer.Game.Worlds;
 public sealed class Chunk : IWriteable {
+    /// <summary>
+    /// Entities within this chunk
+    /// </summary>
+    public readonly Dictionary<uint, Entity> Entities = [];
+
     public readonly uint[] Tiles;
     public readonly byte Width;
     public readonly byte Height;
@@ -107,5 +113,15 @@ public sealed class Chunk : IWriteable {
 
         for (int i = 0; i < Tiles.Length; i++)
             Tiles[i] = r.UInt(b);
+    }
+
+    public void Enter(Entity entity)
+    {
+        Entities.Add(entity.UniqueId, entity);
+    }
+
+    public void Leave(uint entityId)
+    {
+        Entities.Remove(entityId);
     }
 }

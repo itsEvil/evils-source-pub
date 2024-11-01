@@ -93,21 +93,35 @@ public class World : IDisposable
 
     private void Add()
     {
-        foreach (var player in ToAddPlayer)
+        foreach (var player in ToAddPlayer) {
             Players[player.UniqueId] = player;
+            player.Enter(this);
+        }
 
-        foreach (var entity in ToAddEntity)
+        foreach (var entity in ToAddEntity) {
             Entities[entity.UniqueId] = entity;
+            entity.Enter(this);
+        }
     }
 
     private void Remove() {
         //This might throw if it cant find a entity to remove
         try {
             foreach (var id in ToRemovePlayer)
-                Players.Remove(id);
+            {
+                if(Players.TryGetValue(id, out var player)) {
+                    player.Leave(this);
+                }
 
-            foreach (var id in ToRemoveEntity)
+                Players.Remove(id);
+            }
+
+            foreach (var id in ToRemoveEntity) {
+                if(Entities.TryGetValue(id, out var entity)) {
+                    entity.Leave(this);   
+                }
                 Entities.Remove(id);
+            }
         } 
         catch(Exception e)
         {
@@ -121,37 +135,51 @@ public class World : IDisposable
         Add();
         Remove();
 
+        PlayerUpdates.Clear();
+        EntityUpdates.Clear();
+
         //Start ticking all of the players and entities
         foreach (var (_, player) in Players)
             PlayerUpdates.Add(player.Tick());
+        
 
         foreach (var (_, entity) in Entities)
             EntityUpdates.Add(entity.Tick());
 
         //Await all of the tasks
-        //Player updates will likely take longer so we await them first
-        await SetNearby();
+        //Player updates will likely take longer so we start them first
+        //await SetNearby();
         await Task.WhenAll(PlayerUpdates);
         await Task.WhenAll(EntityUpdates);
     }
 
-    private Task SetNearby() {
-        const float Sight = 15f;
-        const float SightSqr = Sight * Sight;
-
-        foreach(var (_, player) in Players) {
-            player.NearbyEntities.Clear();
-
-            foreach(var (_, entity) in Entities) {
-                if(Vector2.DistanceSquared(player.Position, entity.Position) > SightSqr)
-                    continue;
-                
-                player.NearbyEntities.Add(entity);
-            }
-        }
-
-        return Task.CompletedTask;
-    }
+    //private Task SetNearby() {
+    //    const float Sight = 15f;
+    //    const float SightSqr = Sight * Sight;
+    //
+    //    foreach(var (_, player) in Players) {
+    //
+    //        foreach(var (_, entity) in Entities) {
+    //
+    //            if (Vector2.DistanceSquared(player.Position, entity.Position) > SightSqr) //To far away
+    //            {
+    //                if (player.SentEntities.Contains(entity))
+    //                {
+    //                    player.ToRemoveEntities.Enqueue(entity.UniqueId);
+    //                    continue;
+    //                }
+    //
+    //
+    //                continue;
+    //            }
+    //
+    //            player.NewEntities.Enqueue(entity);
+    //        }
+    //
+    //    }
+    //
+    //    return Task.CompletedTask;
+    //}
 
     protected virtual void Update() { }
     private uint NextId = int.MaxValue;

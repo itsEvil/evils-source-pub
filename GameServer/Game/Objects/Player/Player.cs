@@ -1,4 +1,5 @@
-﻿using GameServer.Net;
+﻿using GameServer.Game.Worlds;
+using GameServer.Net;
 using Shared.GameData;
 using System;
 using System.Collections.Generic;
@@ -19,11 +20,28 @@ public partial class Player : Entity {
     protected override void Export(Dictionary<StatType, object> stats) {
         stats[StatType.Name] = Name;
     }
+    public override Task Tick()
+    {
+        SendNewTick();
+
+        return base.Tick();
+    }
+    protected override void OnEnterWorld(World world)
+    {
+        OnEnterUpdate(world);
+    }
+
+    protected override void OnLeaveWorld(World world)
+    {
+        OnLeaveUpdate(world);
+    }
+
     protected override void Update() {
         //Send new tick
 
         //run some logic
 
         //Send update
+        SendUpdate();
     }
 }

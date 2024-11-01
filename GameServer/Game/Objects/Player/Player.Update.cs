@@ -1,19 +1,16 @@
 ﻿using GameServer.Game.Worlds;
 using GameServer.Net;
 using GameServer.Net.Packets;
-using Shared;
-using Shared.GameData;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Numerics;
 
 namespace GameServer.Game.Objects;
 public partial class Player  {    
     //Each tick its filled with latest nearby entities
-    public readonly HashSet<Entity> NearbyEntities = [];
+    public readonly Queue<Entity> SentEntities = [];
+
+    public readonly Queue<Entity> NewEntities = [];
+    public readonly Queue<Entity> ToRemoveEntities = [];
+
 
     private bool[] VisibleChunks = [];
     public bool[] ChunkUpdates = [];
@@ -21,27 +18,28 @@ public partial class Player  {
     //Do not modify the chunks inside of NewChunks!
     private readonly List<Chunk> NewChunks = [];
     private Chunk LastChunk;
-    private void InitOnEnter(World world) {
+    private void OnEnterUpdate(World world) {
         VisibleChunks = new bool[world.Map.Chunks.Length];
         ChunkUpdates = new bool[world.Map.Chunks.Length];
         //Send first tile data to client
+
+
+        NewEntities.Enqueue(this);
+        
         OnMove();
+        SendUpdate();
     }
+
+    private void OnLeaveUpdate(World world) {
+        VisibleChunks = [];
+        ChunkUpdates = [];
+        NewChunks.Clear();
+        LastChunk = null;
+        ToRemoveEntities.Enqueue(this);
+    }
+
     public void OnMove() {
-        //Figure out if we need to send new tiles to player
-
-
-        //For each player make a bool[] the same size as the map chunks
-        //Each chunk is 8x8 so this will give 16 diagonal distance
-        //and 24 horizontal/vertical distance
-        //0,0,1,0,0
-        //0,1,1,1,0
-        //1,1,1,1,1
-        //0,1,1,1,0
-        //0,0,1,0,0
-
-
-        var x = (uint)Position.X;
+        var x = (uint)Math.Abs(Position.X);
         var y = (uint)Position.Y;
 
         var map = World.Map;
@@ -95,37 +93,6 @@ public partial class Player  {
         AddChunk(map.ChunkWidth * (uint)(((y - (1 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x + (2 * map.ChunkSizeWidth)) / map.ChunkHeight));
         AddChunk(map.ChunkWidth * (uint)(((y + (1 * map.ChunkSizeHeight)) / map.ChunkWidth)) + (uint)((x + (2 * map.ChunkSizeWidth)) / map.ChunkHeight));
 
-        //var aboveOne = World.Map.ChunkSize * x + (y + Map.ChunkSize);
-        //var aboveTwo = World.Map.ChunkSize * x + (y + Map.DoubleChunkSize);
-        //
-        //var belowOne = World.Map.ChunkSize * x + (y - Map.ChunkSize);
-        //var belowTwo = World.Map.ChunkSize * x + (y - Map.DoubleChunkSize);
-        //
-        //var leftOne = World.Map.ChunkSize * (x - Map.ChunkSize) + y;
-        //var leftTwo = World.Map.ChunkSize * (x - Map.DoubleChunkSize) + y;
-        //
-        //var rightOne = World.Map.ChunkSize * (x + Map.ChunkSize) + y;
-        //var rightTwo = World.Map.ChunkSize * (x + Map.DoubleChunkSize) + y;
-        //
-        //var upLeftOne = Map.ChunkSize * (x - Map.ChunkSize) + (y + Map.ChunkSize);
-        //var upRightOne = Map.ChunkSize * (x + Map.ChunkSize) + (y + Map.ChunkSize);
-        //
-        //var belowLeftOne = Map.ChunkSize * (x - Map.ChunkSize) + (y - Map.ChunkSize);
-        //var belowRightOne = Map.ChunkSize * (x + Map.ChunkSize) + (y - Map.ChunkSize);
-        //
-        //AddChunk(aboveOne);
-        //AddChunk(aboveTwo);
-        //AddChunk(belowOne);
-        //AddChunk(belowTwo);
-        //AddChunk(leftOne);
-        //AddChunk(leftTwo);
-        //AddChunk(rightOne);
-        //AddChunk(rightTwo);
-        //AddChunk(upLeftOne);
-        //AddChunk(upRightOne);
-        //AddChunk(belowLeftOne);
-        //AddChunk(belowRightOne);
-
         //Do not modify the chunks inside of NewChunks!
         Client.Tcp.EnqueueSend(new Tiles(NewChunks));
     }
@@ -141,14 +108,78 @@ public partial class Player  {
             ChunkUpdates[idx] = false;
 
             var chunk = World.Map.GetChunk(idx);
-            if(chunk != null)
-                NewChunks.Add(chunk);
+            if (chunk == null)
+                return;
+
+            NewChunks.Add(chunk);
         }
     }
 
-    private void SendUpdate() {
+    private readonly List<ObjectInfo> m_NewEntityInfos = [];
+    private readonly List<uint> m_Drops = [];
 
+    private HashSet<Entity> Nearby = [];
 
+    private HashSet<Entity> GetEntitiesFromChunks()
+    {
+        Nearby.Clear();
+        foreach(var chunk in NewChunks)
+        {
+            foreach(var (_, entity) in chunk.Entities)
+            {
+                Nearby.Add(entity);
+            }
+        }
+        return Nearby;
+    }
+    private void SendUpdate()
+    {
+        //const float Sight = 15f;
+        //const float SightSqr = Sight * Sight;
 
+        //var entities = GetEntitiesFromChunks();
+        //foreach (var (_, entity) in World.Entities)
+        //{
+        //    if (Vector2.DistanceSquared(Position, entity.Position) > SightSqr) //To far away
+        //    {
+        //        if (SentEntities.Contains(entity))
+        //        {
+        //            ToRemoveEntities.Enqueue(entity);
+        //            continue;
+        //        }
+        //
+        //
+        //        continue;
+        //    }
+        //
+        //    NewEntities.Enqueue(entity);
+        //}
+
+        if (NewEntities.Count != 0)
+        {
+            m_NewEntityInfos.Clear();
+            var idx = 0;
+            while (NewEntities.TryDequeue(out var entity))
+            {
+                m_NewEntityInfos[idx++] = new ObjectInfo(entity.ObjectId, entity.UniqueId, entity.Position);
+                SentEntities.Enqueue(entity);
+            }
+            
+            Client.Tcp.EnqueueSend(new Net.Packets.Objects(m_NewEntityInfos));
+        }
+
+        if(ToRemoveEntities.Count != 0)
+        {
+            m_Drops.Clear();
+
+            var idx = 0;
+            while(ToRemoveEntities.TryDequeue(out var entity))
+            {
+                m_Drops[idx++] = entity.UniqueId;
+                //SentEntities.Remove(entity);
+            }
+
+            Client.Tcp.EnqueueSend(new Drops(m_Drops));
+        }
     }
 }

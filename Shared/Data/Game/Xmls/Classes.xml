@@ -1,6 +1,6 @@
 ﻿<Class>
-	<Class id="1" name="Basic">
-		<Texture name="minion_stand"/>
+	<Class id="1" name="Wizard">
+		<Texture name="player_basic"/>
 		
 		<!-- 
 		<CharacterTexture name="wizard"/>
@@ -8,5 +8,15 @@
 		<Inventory size="20" empty="0" emptyStack="0">
 			<Item id="1" stack="1"/>
 		</Inventory>
+		<Stats size="8">
+			<Stat index="0" value="120" maxValue="650" min="20" max="40"/> <!-- Health -->
+			<Stat index="1" value="100" maxValue="320" min="10" max="20"/> <!-- Mana -->
+			<Stat index="2" value="20"  maxValue="70"  min="1"  max="3" /> <!-- Attack -->
+			<Stat index="3" value="0"   maxValue="20"  min="0"  max="0" /> <!-- Defense -->
+			<Stat index="4" value="25"  maxValue="50"  min="0"  max="2" /> <!-- Speed -->
+			<Stat index="5" value="20"  maxValue="60"  min="1"  max="2" /> <!-- Dexterity -->
+			<Stat index="6" value="10"  maxValue="40"  min="0"  max="1" /> <!-- Vitality -->
+			<Stat index="7" value="20"  maxValue="70"  min="1"  max="3" /> <!-- Wisdom-->
+		</Stats>
 	</Class>
 </Class>

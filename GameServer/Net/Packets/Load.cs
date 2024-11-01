@@ -44,7 +44,7 @@ public readonly struct Load : IReceive {
         client.Player = new Player(client, world.GetNextId(), client.Character.ClassId);
         world.Enter(client.Player, world.GetSpawnPoint());
 
-        client.Tcp.EnqueueSend(new LoadAck(world.Desc.Name, world.Desc.Description, world.Map.Width, world.Map.Height, world.Map.ChunkSizeWidth, world.Desc.DisplayNames));
+        client.Tcp.EnqueueSend(new LoadAck(world.Desc.Name, world.Desc.Description, world.Map.Width, world.Map.Height, world.Map.ChunkSizeWidth, world.Map.ChunkSizeHeight, world.Desc.DisplayNames, client.Player.UniqueId));
     }
 }
 //Basically Map info
@@ -54,14 +54,17 @@ public readonly struct LoadAck : ISend {
     public readonly string WorldDescription = "";
     public readonly uint Width = 0;
     public readonly uint Height = 0;
-    public readonly ushort ChunkSize = 8;
+    public readonly ushort ChunkWidth = 8;
+    public readonly ushort ChunkHeight = 8;
     public readonly bool DisplayNames = false;
-    public LoadAck(string worldName, string worldDesc, uint width, uint height, ushort chunkSize, bool displayNames) {
+    public readonly uint PlayerId;
+    public LoadAck(string worldName, string worldDesc, uint width, uint height, ushort chunkWidth, ushort chunkHeight, bool displayNames, uint playerId) {
         WorldName = worldName;
         WorldDescription = worldDesc;
         Width = width;
         Height = height;
-        ChunkSize = chunkSize;
+        ChunkWidth = chunkWidth;
+        ChunkHeight = chunkHeight;
         DisplayNames = displayNames;
     }
     public void Write(Writer w, Span<byte> b) {
@@ -69,7 +72,8 @@ public readonly struct LoadAck : ISend {
         w.Write(b, WorldDescription);
         w.Write(b, Width);
         w.Write(b, Height);
-        w.Write(b, ChunkSize);
+        w.Write(b, ChunkWidth);
+        w.Write(b, ChunkHeight);
         w.Write(b, DisplayNames);
     }
 }
