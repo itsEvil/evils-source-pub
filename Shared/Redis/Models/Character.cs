@@ -11,6 +11,7 @@ public sealed class Character : RedisObject, IWriteable
     public uint Exp { get => GetValue<uint>("exp", 0); set => SetValue("exp", value); }
     public uint ExpGoal { get => GetValue<uint>("expGoal", 0); set => SetValue("expGoal", value); }
     public DateTime LastPlayed { get => GetValue<DateTime>("lastPlayed", DateTime.MinValue); set => SetValue("lastPlayed", value); }
+    public DateTime CreationTime { get => GetValue<DateTime>("creationTime", DateTime.MinValue); set => SetValue("creationTime", value); }
     public uint[] Attributes { get => GetValue<uint[]>("attributes", []); set => SetValue("attributes", value); }
     public uint[] MaxAttributes { get => GetValue<uint[]>("maxAttributes", []); set => SetValue("maxAttributes", value); }
     public ItemData[] Inventory { get => GetValue<ItemData[]>("inventory", []); set => SetValue("inventory", value); }

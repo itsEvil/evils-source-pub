@@ -145,6 +145,10 @@ public sealed class RedisDb {
             Level = desc.Level,
             Exp = desc.Exp,
             ExpGoal = desc.ExpGoal,
+            Id = newId,
+            ClassId = desc.Id,
+            LastPlayed = DateTime.Now,
+            CreationTime = DateTime.Now,
         };
 
         account.Alive = [.. account.Alive, character.Id];
