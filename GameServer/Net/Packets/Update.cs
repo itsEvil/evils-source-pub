@@ -4,7 +4,6 @@ using Shared.Interfaces;
 using System.Numerics;
 using Shared.GameData;
 using Shared.Redis.Models;
-using GameServer.Game;
 
 namespace GameServer.Net.Packets;
 public readonly struct Update(UpdateInfo[] objects) : ISend {
@@ -117,13 +116,17 @@ public sealed class UpdateInfo : IWriteable
         for(int i = 0; i < Stats.Length; i++) {
             var kvp = span[i];
             w.Write(b, (ushort)kvp.Key);
+#if DEBUG
             try
             {
+#endif
                 WriteObject(w, b, kvp.Key, kvp.Value);
+#if DEBUG
             }
             catch (Exception e) {
                 SLog.Error(e);
             }
+#endif
         }
     }
     private static void WriteObject(Writer w, Span<byte> b, StatType key, object data) {

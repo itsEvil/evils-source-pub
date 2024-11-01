@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Shared.GameData;
-public sealed class EnemyDesc : ObjectDesc
+public sealed class CharacterDesc : ObjectDesc
 {
-    public EnemyDesc(XElement e, uint type, string id) : base(e, type, id)
+    public readonly uint MaximumHealth;
+    public CharacterDesc(XElement e, uint type, string id) : base(e, type, id)
     {
 
     }

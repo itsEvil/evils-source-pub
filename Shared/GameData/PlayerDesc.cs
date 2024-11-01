@@ -78,13 +78,13 @@ public sealed class PlayerDesc : ObjectDesc
 
         return new StatsDesc[size];
     }
-    private ItemData[] ParseInventory(XElement e)
+    private static ItemData[] ParseInventory(XElement e)
     {
         var size = e.ParseUInt("@size", undefined: 0);
         if (size == 0)
             return [];
 
-        var empty = e.ParseUInt("@empty", undefined: Resources.EmptyItemId);
+        var empty = e.ParseUInt("@empty", undefined: 0);
         var emptyStack = e.ParseUInt("@emptyStack");
 
         var inventory = new ItemData[size];

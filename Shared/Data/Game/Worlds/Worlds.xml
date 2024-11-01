@@ -2,5 +2,25 @@
 	<World name="Town" id="0">
 		<Desc>This is a town.</Desc>
 		<Path>Town\Town.map</Path>
+		<Type>World</Type>
 	</World>
+	
+	<!--
+	<World name="Submerged World" id="1">
+		<Desc>This world is submerged</Desc>
+		<Path>Submerged\Map.map</Path>
+		<Type>Submerged</Type>
+		<Template/>
+	</World>
+	-->
+
+	<!--
+	<World name="Arena World" id="2">
+		<Desc>This world is a arena</Desc>
+		<Path>Arena\Map.map</Path>
+		<Type>Arena</Type>
+		<Template/>
+	</World>
+	-->
+	
 </Worlds>

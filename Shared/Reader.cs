@@ -3,6 +3,7 @@ using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,74 +24,79 @@ public sealed class Reader
         Length = length;
         Position = 0;
     }
-    public byte Byte(Span<byte> buffer)
+    public byte Byte(Span<byte> buffer, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + ByteLen > Length)
         {
             Position++;
+            var ex = new Exception($"Receive buffer attempted to read out of bounds {Position}, {Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            SLog.Error("Receive buffer attempted to read out of bounds {0}, {1}", args: [Position, Length]);
+            SLog.Error(ex);
 #endif
-            return 0;
+            throw ex;
         }
 
         return buffer[Position++];
     }
-    public bool Bool(Span<byte> buffer) => Byte(buffer) == 1;
-    public short Short(Span<byte> buffer)
+    public bool Bool(Span<byte> buffer, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0) => Byte(buffer) == 1;
+    public short Short(Span<byte> buffer, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + ShortLen > Length)
         {
             Position += ShortLen;
+            var ex = new Exception($"Receive buffer attempted to read out of bounds {Position}, {Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            SLog.Error("Receive buffer attempted to read out of bounds {0}, {1}", args: [Position, Length]);
+            SLog.Error(ex);
 #endif
-            return 0;
+            throw ex;
         }
 
         var data = BinaryPrimitives.ReadInt16BigEndian(buffer[Position..]);
         Position += ShortLen;
         return data;
     }
-    public ushort UShort(Span<byte> buffer)
+    public ushort UShort(Span<byte> buffer, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + ShortLen > Length)
         {
             Position += ShortLen;
+            var ex = new Exception($"Receive buffer attempted to read out of bounds {Position}, {Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            SLog.Error("Receive buffer attempted to read out of bounds {0}, {1}", args: [Position, Length]);
+            SLog.Error(ex);
 #endif
-            return 0;
+            throw ex;
         }
 
         var data = BinaryPrimitives.ReadUInt16BigEndian(buffer[Position..]);
         Position += ShortLen;
         return data;
     }
-    public int Int(Span<byte> buffer)
+    public int Int(Span<byte> buffer, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + IntLen > Length)
         {
             Position += IntLen;
+            var ex = new Exception($"Receive buffer attempted to read out of bounds {Position}, {Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            SLog.Error("Receive buffer attempted to read out of bounds {0}, {1}", args: [Position, Length]);
+            SLog.Error(ex);
 #endif
-            return 0;
+            throw ex;
         }
 
         var data = BinaryPrimitives.ReadInt32BigEndian(buffer[Position..]);
         Position += IntLen;
         return data;
     }
-    public uint UInt(Span<byte> buffer)
+    public uint UInt(Span<byte> buffer, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + IntLen > Length)
         {
             Position += IntLen;
+            var ex = new Exception($"Receive buffer attempted to read out of bounds {Position}, {Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            SLog.Error("Receive buffer attempted to read out of bounds {0}, {1}", args: [Position, Length]);
+            SLog.Error(ex);
 #endif
-            return 0;
+            throw ex;
         }
 
         var data = BinaryPrimitives.ReadUInt32BigEndian(buffer[Position..]);
@@ -98,15 +104,16 @@ public sealed class Reader
         return data;
     }
 
-    public long Long(Span<byte> buffer)
+    public long Long(Span<byte> buffer, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + LongLen > Length)
         {
             Position += LongLen;
+            var ex = new Exception($"Receive buffer attempted to read out of bounds {Position}, {Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            SLog.Error("Receive buffer attempted to read out of bounds {0}, {1}", args: [Position, Length]);
+            SLog.Error(ex);
 #endif
-            return 0;
+            throw ex;
         }
 
         var data = BinaryPrimitives.ReadInt64BigEndian(buffer[Position..]);
@@ -114,15 +121,16 @@ public sealed class Reader
         return data;
     }
 
-    public ulong ULong(Span<byte> buffer)
+    public ulong ULong(Span<byte> buffer, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + LongLen > Length)
         {
             Position += LongLen;
+            var ex = new Exception($"Receive buffer attempted to read out of bounds {Position}, {Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            SLog.Error("Receive buffer attempted to read out of bounds {0}, {1}", args: [Position, Length]);
+            SLog.Error(ex);
 #endif
-            return 0;
+            throw ex;
         }
 
         var data = BinaryPrimitives.ReadUInt64BigEndian(buffer[Position..]);
@@ -130,15 +138,16 @@ public sealed class Reader
         return data;
     }
 
-    public float Float(Span<byte> buffer)
+    public float Float(Span<byte> buffer, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + IntLen > Length)
         {
             Position += IntLen;
+            var ex = new Exception($"Receive buffer attempted to read out of bounds {Position}, {Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            SLog.Error("Receive buffer attempted to read out of bounds {0}, {1}", args: [Position, Length]);
+            SLog.Error(ex);
 #endif
-            return 0;
+            throw ex;
         }
 
         Span<byte> buf = stackalloc byte[4];
@@ -152,15 +161,16 @@ public sealed class Reader
         Position += IntLen;
         return data;
     }
-    public double Double(Span<byte> buffer)
+    public double Double(Span<byte> buffer, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + LongLen > Length)
         {
             Position += LongLen;
+            var ex = new Exception($"Receive buffer attempted to read out of bounds {Position}, {Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            SLog.Error("Receive buffer attempted to read out of bounds {0}, {1}", args: [Position, Length]);
+            SLog.Error(ex);
 #endif
-            return 0;
+            throw ex;
         }
 
         Span<byte> buf = stackalloc byte[8];
@@ -180,25 +190,27 @@ public sealed class Reader
     /// <summary>
     /// Reads a <see cref="short"/> length then tries to read <see cref="string"/> using the length.
     /// </summary>
-    public string StringShort(Span<byte> buffer)
+    public string StringShort(Span<byte> buffer, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         var length = Short(buffer);
         if (length <= 0)
         {
+            var ex = new Exception($"Receive buffer attempted to read out of bounds {Position}, {Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            SLog.Error("String length is Zero", args: []);
+            SLog.Error(ex);
 #endif
-            return "";
+            throw ex;
         }
 
 
         if (Position + length > Length)
         {
             Position += length;
+            var ex = new Exception($"Receive buffer attempted to read out of bounds {Position}, {Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            SLog.Error("Receive buffer attempted to read out of bounds {0}, {1}", args: [Position, Length]);
+            SLog.Error(ex);
 #endif
-            return "";
+            throw ex;
         }
 
         var data = Encoding.UTF8.GetString(buffer[Position..(Position + length)]);
@@ -211,25 +223,27 @@ public sealed class Reader
     /// <summary>
     /// Reads a <see cref="int"/> length then tries to read <see cref="string"/> using the length.
     /// </summary>
-    public string StringInt(Span<byte> buffer)
+    public string StringInt(Span<byte> buffer, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         var length = Int(buffer);
         if (length <= 0)
         {
+            var ex = new Exception($"Receive buffer attempted to read out of bounds {Position}, {Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            SLog.Error("String length is Zero", args: []);
+            SLog.Error(ex);
 #endif
-            return "";
+            throw ex;
         }
 
 
         if (Position + length > Length)
         {
             Position += length;
+            var ex = new Exception($"Receive buffer attempted to read out of bounds {Position}, {Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            SLog.Error("Receive buffer attempted to read out of bounds {0}, {1}", args: [Position, Length]);
+            SLog.Error(ex);
 #endif
-            return "";
+            throw ex;
         }
 
         var data = Encoding.UTF8.GetString(buffer[Position..(Position + length)]);
@@ -243,7 +257,7 @@ public sealed class Reader
     /// <summary>
     /// Only primatives are supported by this method, try not to use this as it will allocate objects when reading the primative
     /// </summary>
-    public T[] ReadArray<T>(Span<byte> b)
+    public T[] ReadArray<T>(Span<byte> b, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         var len = UShort(b);
 
@@ -257,7 +271,7 @@ public sealed class Reader
     /// <summary>
     /// Read a primative of type T, try not to use this as it needs to cast to object then T when reading the primative
     /// </summary>
-    public T Read<T>(Span<byte> b, T ignoreThisParameter = default)
+    public T Read<T>(Span<byte> b, T ignoreThisParameter = default, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         switch (ignoreThisParameter)
         {

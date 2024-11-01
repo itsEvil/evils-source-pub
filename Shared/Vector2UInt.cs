@@ -1,9 +1,22 @@
 ﻿using System.Numerics;
 
 namespace Shared;
-public struct Vector2UInt(uint x, uint y) {
-    public uint X = x;
-    public uint Y = y;
+public struct Vector2UInt
+{
+    public uint X;
+    public uint Y;
+
+    public Vector2UInt(uint x, uint y)
+    {
+        X = x;
+        Y = y;
+    }
+    public Vector2UInt(Vector2 position)
+    {
+        X = (uint)position.X;
+        Y = (uint)position.Y;
+    }
+
     public override readonly string ToString()
     {
         return $"X: {X} Y:{Y}";

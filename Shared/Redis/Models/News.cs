@@ -13,6 +13,9 @@ public sealed class News : RedisObject, IWriteable {
         Id = id;
     }
     public void Write(Writer w, Span<byte> b) {
+        //Version
+        w.Write(b, (byte)0);
+
         w.Write(b, Title);
         w.Write(b, ImageUrl);
         w.Write(b, ActionUrl);

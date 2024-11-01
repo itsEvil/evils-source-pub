@@ -1,6 +1,7 @@
 ﻿using GameServer.Game.Worlds;
 using GameServer.Net;
 using GameServer.Net.Packets;
+using Shared;
 using Shared.GameData;
 using System;
 using System.Collections.Generic;

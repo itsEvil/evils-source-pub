@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Shared.GameData;
 
-namespace GameServer.Game;
-public enum ConditionEffect
-{
+public enum ConditionEffect {
     Mending = 0, //Flat Temporary Vitality Increase (+50 uncapped)
     Protection = 1, //% Increased defenses (+5% per stack)
     Slowness = 2, //% Reduced speed (-15% per stack. min 0)
@@ -17,13 +11,18 @@ public enum ConditionEffect
     Paralyzed = 6, //Flat Temporary reduced Speed (-50 speed. min 0)
 }
 
-public static class Effects
-{
-    public static readonly ConditionEffect[] Array = (ConditionEffect[])Enum.GetValues(typeof(ConditionEffect));
-    public static float GetBaseValue(ConditionEffect effect)
-    {
-        return effect switch
-        {
+public static class Effects {
+    public static readonly ConditionEffect[] Array = [
+        ConditionEffect.Mending,
+        ConditionEffect.Protection,
+        ConditionEffect.Slowness,
+        ConditionEffect.Swiftness,
+        ConditionEffect.Berserk,
+        ConditionEffect.Damaging,
+        ConditionEffect.Paralyzed,
+    ];
+    public static float GetBaseValue(ConditionEffect effect) {
+        return effect switch {
             ConditionEffect.Mending => 50,
             ConditionEffect.Protection => 5,
             ConditionEffect.Slowness => .15f,
@@ -34,12 +33,10 @@ public static class Effects
             _ => 0,
         };
     }
-
+    
     //Server side only...
-    public static uint GetMaxStack(ConditionEffect effect)
-    {
-        return effect switch
-        {
+    public static uint GetMaxStack(ConditionEffect effect) {
+        return effect switch {
             ConditionEffect.Mending => 1,
             ConditionEffect.Protection => 10,
             ConditionEffect.Slowness => 5,

@@ -38,6 +38,7 @@ public readonly struct Load : IReceive {
             //change world to nexus
         }
 
+        client.Character.LastPlayed = DateTime.Now;
         client.Character.FlushAsync();
 
         client.Player = new Player(client, world.GetNextId(), client.Character.ClassId);

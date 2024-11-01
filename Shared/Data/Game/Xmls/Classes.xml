@@ -1,5 +1,12 @@
 ﻿<Class>
 	<Class id="1" name="Basic">
 		<Texture name="minion_stand"/>
+		
+		<!-- 
+		<CharacterTexture name="wizard"/>
+		-->
+		<Inventory size="20" empty="0" emptyStack="0">
+			<Item id="1" stack="1"/>
+		</Inventory>
 	</Class>
 </Class>

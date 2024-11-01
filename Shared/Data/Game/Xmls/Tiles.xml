@@ -1,9 +1,4 @@
 ﻿<Tiles>
-	<Tile id="0" name="Error">
-		<Texture name="engine"/>
-		<NoWalk/>
-	</Tile>
-	
 	<Tile id="1" name="Grass">
 		<Texture name="grass"/>
 	</Tile>
@@ -19,5 +14,4 @@
 	<Tile id="4" name="Platform">
 		<Texture name="platform"/>
 	</Tile>
-
 </Tiles>

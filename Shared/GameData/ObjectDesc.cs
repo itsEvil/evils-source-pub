@@ -8,12 +8,14 @@ public enum ClassType {
     Enemy,
     Projectile,
 }
-public class ObjectDesc {
+public abstract class ObjectDesc {
     public readonly uint Id;
+    public readonly uint UniqueId;
     public readonly string Name;
     public readonly ClassType Class;
     public ObjectDesc(XElement e, uint id, string name) {
         Id = id;
+        UniqueId = Resources.GetNextUniqueId();
         Name = name;
         Class = e.ParseEnum("Class", ClassType.GameObject);
     }

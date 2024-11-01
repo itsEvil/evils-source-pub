@@ -263,7 +263,7 @@ public class TcpClient
     {
         var buffer = m_Receive.Data.AsSpan();
 
-        while (m_Reader.Position + 6 < totalLength)
+        while (m_Reader.Position + 6 <= totalLength)
         {
             uint packetLength = m_Reader.UInt(buffer);
             var packetId = m_Reader.UShort(buffer);

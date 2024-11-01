@@ -87,4 +87,14 @@ public sealed class WorldsManager {
         NextWorldId -= 1;
         return NextWorldId;
     }
+
+}
+public class WorldIds(uint townId)
+{
+    public readonly uint TownId = townId;
+    public void Write(Writer w, Span<byte> b)
+    {
+        w.Write(b, (byte)0);
+        w.Write(b, TownId);
+    }
 }

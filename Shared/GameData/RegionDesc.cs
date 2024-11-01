@@ -7,6 +7,11 @@ public enum Region {
     TownPortals,
     Storage,
     GuildPortal,
+    AirVent, //Used in Submerged worlds
+
+    WeakMonsterSpawn, //Used in Arena
+    NormalMonsterSpawn, //Used in Arena
+    HardMonsterSpawn, //Used in Arena
 }
 public sealed class RegionDesc : ObjectDesc {
     public readonly Region Type;

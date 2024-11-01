@@ -9,6 +9,9 @@ public readonly struct Login : IReceive {
     public readonly string Email;
     public readonly string Password;
     public Login(Reader r, Span<byte> b) {
+        //Version
+        _ = r.Byte(b);
+
         Email = r.StringShort(b);
         Password = r.StringShort(b);
     }
@@ -46,8 +49,12 @@ public readonly struct Login : IReceive {
 
         SLog.Debug("Sending back LoginAck to {0}", args: [acc.Name]);
         client.Account = acc;
-        client.LastMessageTime = DateTime.Now;
-        client.Tcp.EnqueueSend(new LoginAck(acc, redis.GameServers));
+        var now = DateTime.Now;
+        client.Account.LastOnlineTime = now;
+        client.Account.FlushAsync();
+
+        client.LastMessageTime = now;
+        client.Tcp.EnqueueSend(new LoginAck(client.Account, redis.GameServers));
     }
 }
 public readonly struct LoginAck(Account account, Server[] servers) : ISend {

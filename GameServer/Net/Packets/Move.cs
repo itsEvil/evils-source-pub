@@ -1,6 +1,7 @@
 ﻿using Shared;
 using GameServer.Net.Interfaces;
 using System.Numerics;
+using GameServer.Game.Objects;
 
 namespace GameServer.Net.Packets;
 public readonly struct Move : IReceive {
@@ -22,6 +23,13 @@ public readonly struct Move : IReceive {
             SLog.Debug("Position for player {0} at {1} is invalid.", args: [player.Name, Position]);
             return;
         }
+
+        var speedStat = player.GetAttribute(Player.GetAttributeIndexCast(AttributeType.Speed));
+        var speed = player.GetMovementSpeed(speedStat);
+
+        var distSqr = Vector2.DistanceSquared(client.Player.Position, Position);
+        
+
 
         client.Player.Position = Position;
         client.Player.OnMove();

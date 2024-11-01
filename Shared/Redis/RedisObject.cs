@@ -10,7 +10,7 @@ using System.Text.Json;
 namespace Shared.Redis;
 public abstract class RedisObject
 {
-    public RedisObject(IDatabase db, string key, string? field = null, bool isAsync = false) {
+    public RedisObject(IDatabase db, string key, string field = null, bool isAsync = false) {
         Key = key;
         Database = db;
 
@@ -149,11 +149,12 @@ public abstract class RedisObject
 
         if (typeof(T) == typeof(ItemData[]))
         {
-            var reader = new Reader();
-            var buff = val.Key.AsSpan();
-            _ = reader.Byte(buff); //version
+            var r = new Reader();
+            var b = val.Key.AsSpan();
+            r.Reset(b.Length);
+            _ = r.Byte(b); //version
             //if(version == 0)
-            return (T)(object)ReadItemDataVersionZero(reader, buff);
+            return (T)(object)ReadItemDataVersionZero(r, b);
         }
 
         if (typeof(T) == typeof(string[]))
@@ -161,14 +162,14 @@ public abstract class RedisObject
 
         throw new NotSupportedException();
     }
-    private static ItemData[] ReadItemDataVersionZero(Reader reader, Span<byte> buff) {
-        var length = reader.UShort(buff);
+    private static ItemData[] ReadItemDataVersionZero(Reader r, Span<byte> b) {
+        var length = r.UShort(b);
         ItemData[] arr = new ItemData[length];
         for (int i = 0; i < arr.Length; i++) {
             arr[i] = new ItemData(
-                reader.UInt(buff),
-                reader.UInt(buff),
-                reader.UInt(buff)
+                r.UInt(b),
+                r.UInt(b),
+                r.UInt(b)
             );
         }
         return arr;
@@ -230,60 +231,62 @@ public abstract class RedisObject
             _entries = entry.ToDictionary(x => x.Name, x => new KeyValuePair<byte[], bool>(x.Value, false));
         }
     }
-    private static readonly int ItemDataSize = Marshal.SizeOf<ItemData>();
     protected void SetValue<T>(RedisValue key, T val)
     {
         if (val == null)
             return;
 
-        byte[] buff;
+        byte[] b;
 
         if (typeof(T) == typeof(int) || typeof(T) == typeof(uint) || typeof(T) == typeof(ushort) || typeof(T) == typeof(string) || typeof(T) == typeof(float))
-            buff = Encoding.UTF8.GetBytes(val.ToString());
+            b = Encoding.UTF8.GetBytes(val.ToString());
         else if (typeof(T) == typeof(bool))
-            buff = new byte[] { (byte)((bool)(object)val ? 1 : 0) };
+            b = [(byte)((bool)(object)val ? 1 : 0)];
         else if (typeof(T) == typeof(DateTime))
-            buff = BitConverter.GetBytes(((DateTime)(object)val).ToBinary());
+            b = BitConverter.GetBytes(((DateTime)(object)val).ToBinary());
         else if (typeof(T) == typeof(byte[]))
-            buff = (byte[])(object)val;
+            b = (byte[])(object)val;
         else if (typeof(T) == typeof(ushort[]))
         {
             var v = (ushort[])(object)val;
 
-            buff = new byte[v.Length * 2];
+            b = new byte[v.Length * 2];
 
-            Buffer.BlockCopy(v, 0, buff, 0, buff.Length);
+            Buffer.BlockCopy(v, 0, b, 0, b.Length);
         }
         else if (typeof(T) == typeof(int[]) || typeof(T) == typeof(uint[]))
         {
             var v = (int[])(object)val;
 
-            buff = new byte[v.Length * 4];
+            b = new byte[v.Length * 4];
 
-            Buffer.BlockCopy(v, 0, buff, 0, buff.Length);
+            Buffer.BlockCopy(v, 0, b, 0, b.Length);
         }
         else if(typeof(T) == typeof(string[]))
         {
             var arr = (string[])(object)val;
-            buff = Encoding.UTF8.GetBytes(arr.ToJson());
+            b = Encoding.UTF8.GetBytes(arr.ToJson());
         }
         else if (typeof(T) == typeof(ItemData[]))
         {
             var arr = (ItemData[])(object)val;
-            var size = ItemDataSize * arr.Length;
+            var size = ItemData.GetSize() * arr.Length;
 
-            buff = new byte[size + 3];
-            var writer = new Writer();
-            writer.Write(buff, (byte)0); //item data version
-            writer.Write(buff, (ushort)arr.Length);
+            const int extras = sizeof(byte) + sizeof(ushort);
+
+            b = new byte[size + extras];
+            var w = new Writer();
+            w.Write(b, (byte)0); //item data version
+            w.Write(b, (ushort)arr.Length);
+            
             for (int i = 0; i < arr.Length; i++)
-                arr[i].Write(writer, buff);
+                arr[i].Write(w, b);
         }
         else
             throw new NotSupportedException();
 
-        if (!_entries.ContainsKey(Key) || _entries[Key].Key == null || !buff.SequenceEqual(_entries[Key].Key))
-            _entries[key] = new KeyValuePair<byte[], bool>(buff, true);
+        if (!_entries.ContainsKey(Key) || _entries[Key].Key == null || !b.SequenceEqual(_entries[Key].Key))
+            _entries[key] = new KeyValuePair<byte[], bool>(b, true);
     }
 
     private void ReadyFlush()

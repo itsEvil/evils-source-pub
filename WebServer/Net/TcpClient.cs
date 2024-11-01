@@ -218,7 +218,8 @@ public class TcpClient {
         try
         {
             var length = m_Socket.Receive(m_Receive.Data);
-        
+            SLog.Debug("Received {0} bytes", args: [length]);
+
             if(length == 0) {
                 SLog.Debug("Received length is zero... likely closed connection...");
                 Disconnect();
@@ -257,7 +258,7 @@ public class TcpClient {
     {
         var buffer = m_Receive.Data.AsSpan();
 
-        while(m_Reader.Position + 6 < totalLength)
+        while(m_Reader.Position + 6 <= totalLength)
         {
             uint packetLength = m_Reader.UInt(buffer);
             var packetId = m_Reader.UShort(buffer);

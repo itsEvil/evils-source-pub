@@ -25,6 +25,7 @@ public readonly struct Create(Reader r, Span<byte> b) : IReceive
             return;
         }
 
+        SLog.Debug("Found: {0}:{1} class", args: [@class.Name, @class.Id]);
 
         var redis = app.Redis;
         var character = redis.CreateCharacter(client.Account, @class);

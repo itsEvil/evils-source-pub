@@ -29,7 +29,13 @@
 	<Character id="0" name="Empty Character">
 		
 	</Character>
-	
+
+	<Tile id="0" name="Error">
+		<Texture name="engine"/>
+		<NoWalk/>
+	</Tile>
+
+	<!-- 
 	<Character id="1" name="Enemy">
 		<Enemy/>
 	</Character>
@@ -37,5 +43,5 @@
 	<Character id="2" name="NPC">
 		
 	</Character>
-	
+	-->
 </Objects>

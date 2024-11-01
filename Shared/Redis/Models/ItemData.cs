@@ -24,4 +24,10 @@ public sealed class ItemData : IWriteable {
         w.Write(b, Id);
         w.Write(b, Stacks);
     }
+
+    public static int GetSize() {
+        const int uintSize = sizeof(uint);
+        //We don't write the IsEmpty value into the db or to player
+        return uintSize * 3;
+    }
 }

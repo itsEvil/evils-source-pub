@@ -1,4 +1,6 @@
 ﻿using System.Buffers.Binary;
+using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -18,18 +20,16 @@ public sealed class Writer
     /// <summary>
     /// Writes a byte
     /// </summary>
-    public void Write(Span<byte> buffer, byte value)
+    public void Write(Span<byte> buffer, byte value, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + ByteLen > buffer.Length)
         {
             Position++;
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
             SLog.Error(ex);
-            throw ex;
-#else
-            return;
 #endif
+            throw ex;
         }
 
         buffer[Position++] = value;
@@ -37,22 +37,20 @@ public sealed class Writer
     /// <summary>
     /// Writes a bool
     /// </summary>
-    public void Write(Span<byte> buffer, bool value) => Write(buffer, (byte)(value == true ? 1 : 0));
+    public void Write(Span<byte> buffer, bool value, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0) => Write(buffer, (byte)(value == true ? 1 : 0), caller, path, line);
     /// <summary>
     /// Writes a short
     /// </summary>
-    public void Write(Span<byte> buffer, short value)
+    public void Write(Span<byte> buffer, short value, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + ShortLen > buffer.Length)
         {
             Position += ShortLen;
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
             SLog.Error(ex);
-            throw ex;
-#else
-            return;
 #endif
+            throw ex;
         }
 
         BinaryPrimitives.WriteInt16BigEndian(buffer[Position..], value);
@@ -61,18 +59,16 @@ public sealed class Writer
     /// <summary>
     /// Writes a ushort
     /// </summary>
-    public void Write(Span<byte> buffer, ushort value)
+    public void Write(Span<byte> buffer, ushort value, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + ShortLen > buffer.Length)
         {
             Position += ShortLen;
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
             SLog.Error(ex);
-            throw ex;
-#else
-            return;
 #endif
+            throw ex;
         }
 
         BinaryPrimitives.WriteUInt16BigEndian(buffer[Position..], value);
@@ -81,18 +77,16 @@ public sealed class Writer
     /// <summary>
     /// Writes a int
     /// </summary>
-    public void Write(Span<byte> buffer, int value)
+    public void Write(Span<byte> buffer, int value, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + IntLen > buffer.Length)
         {
             Position += IntLen;
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
             SLog.Error(ex);
-            throw ex;
-#else
-            return;
 #endif
+            throw ex;
         }
 
         BinaryPrimitives.WriteInt32BigEndian(buffer[Position..], value);
@@ -101,18 +95,16 @@ public sealed class Writer
     /// <summary>
     /// Writes a uint
     /// </summary>
-    public void Write(Span<byte> buffer, uint value)
+    public void Write(Span<byte> buffer, uint value, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + IntLen > buffer.Length)
         {
             Position += IntLen;
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
             SLog.Error(ex);
-            throw ex;
-#else
-            return;
 #endif
+            throw ex;
         }
 
         BinaryPrimitives.WriteUInt32BigEndian(buffer[Position..], value);
@@ -121,18 +113,16 @@ public sealed class Writer
     /// <summary>
     /// Writes a long
     /// </summary>
-    public void Write(Span<byte> buffer, long value)
+    public void Write(Span<byte> buffer, long value, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + LongLen > buffer.Length)
         {
             Position += LongLen;
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
             SLog.Error(ex);
-            throw ex;
-#else
-            return;
 #endif
+            throw ex;
         }
 
         BinaryPrimitives.WriteInt64BigEndian(buffer[Position..], value);
@@ -141,18 +131,16 @@ public sealed class Writer
     /// <summary>
     /// Writes a ulong
     /// </summary>
-    public void Write(Span<byte> buffer, ulong value)
+    public void Write(Span<byte> buffer, ulong value, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + LongLen > buffer.Length)
         {
             Position += LongLen;
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
             SLog.Error(ex);
-            throw ex;
-#else
-            return;
 #endif
+            throw ex;
         }
 
         BinaryPrimitives.WriteUInt64BigEndian(buffer[Position..], value);
@@ -161,18 +149,16 @@ public sealed class Writer
     /// <summary>
     /// Writes a float
     /// </summary>
-    public void Write(Span<byte> buffer, float value)
+    public void Write(Span<byte> buffer, float value, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + IntLen > buffer.Length)
         {
             Position += IntLen;
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
             SLog.Error(ex);
-            throw ex;
-#else
-            return;
 #endif
+            throw ex;
         }
 
         var bytes = BitConverter.GetBytes(value);
@@ -186,18 +172,16 @@ public sealed class Writer
     /// <summary>
     /// Writes a double
     /// </summary>
-    public void Write(Span<byte> buffer, double value)
+    public void Write(Span<byte> buffer, double value, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         if (Position + LongLen > buffer.Length)
         {
             Position += LongLen;
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
             SLog.Error(ex);
-            throw ex;
-#else
-            return;
 #endif
+            throw ex;
         }
 
 
@@ -216,32 +200,28 @@ public sealed class Writer
     /// <summary>
     /// Writes a string using short for length of the string
     /// </summary>
-    public void Write(Span<byte> buffer, string value)
+    public void Write(Span<byte> buffer, string value, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         var bytes = Encoding.UTF8.GetBytes(value);
         Write(buffer, (ushort)bytes.Length);
         if (bytes.Length <= 0)
         {
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
             SLog.Error(ex);
-            throw ex;
-#else
-            return;
 #endif
+            throw ex;
         }
 
 
         if (Position + bytes.Length > buffer.Length)
         {
             Position += bytes.Length;
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
             SLog.Error(ex);
-            throw ex;
-#else
-            return;
 #endif
+            throw ex;
         }
 
         bytes.CopyTo(buffer[Position..]);
@@ -250,32 +230,28 @@ public sealed class Writer
     /// <summary>
     /// Writes a string using int for the length of the string
     /// </summary>
-    public void WriteStringInt(Span<byte> buffer, string value)
+    public void WriteStringInt(Span<byte> buffer, string value, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         var bytes = Encoding.UTF8.GetBytes(value);
         Write(buffer, bytes.Length);
         if (bytes.Length <= 0)
         {
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
             SLog.Error(ex);
-            throw ex;
-#else
-            return;
 #endif
+            throw ex;
         }
 
 
         if (Position + bytes.Length > buffer.Length)
         {
             Position += bytes.Length;
+            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length} via {caller} \n\t at {path} L.{line}");
 #if DEBUG
-            var ex = new Exception($"Writer attempted to write out of bounds: {Position}, {buffer.Length}");
             SLog.Error(ex);
-            throw ex;
-#else
-            return;
 #endif
+            throw ex;
         }
 
         bytes.CopyTo(buffer[Position..]);
@@ -285,7 +261,7 @@ public sealed class Writer
     /// <summary>
     /// Only primatives are supported by this method.
     /// </summary>
-    public void WriteArray<T>(Span<byte> buffer, T[] array)
+    public void WriteArray<T>(Span<byte> buffer, T[] array, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         Write(buffer, (ushort)array.Length);
         var span = array.AsSpan();
@@ -295,29 +271,29 @@ public sealed class Writer
     /// <summary>
     /// Write a primative of type T
     /// </summary>
-    public void Write<T>(Span<byte> b, T value)
+    public void Write<T>(Span<byte> b, T value, [CallerMemberName] string caller = "", [CallerFilePath] string path = "", [CallerLineNumber] int line = 0)
     {
         switch (value)
         {
-            case byte v: Write(b, v); break;
-            case bool v: Write(b, v); break;
-            case short v: Write(b, v); break;
-            case ushort v: Write(b, v); break;
-            case int v: Write(b, v); break;
-            case uint v: Write(b, v); break;
-            case float v: Write(b, v); break;
-            case double v: Write(b, v); break;
-            case long v: Write(b, v); break;
-            case ulong v: Write(b, v); break;
+            case byte v: Write(b, v, caller, path, line); break;
+            case bool v: Write(b, v, caller, path, line); break;
+            case short v: Write(b, v, caller, path, line); break;
+            case ushort v: Write(b, v, caller, path, line); break;
+            case int v: Write(b, v, caller, path, line); break;
+            case uint v: Write(b, v, caller, path, line); break;
+            case float v: Write(b, v, caller, path, line); break;
+            case double v: Write(b, v, caller, path, line); break;
+            case long v: Write(b, v, caller, path, line); break;
+            case ulong v: Write(b, v, caller, path, line); break;
             case string v:
                 {
                     if (v.Length >= ushort.MaxValue)
-                        WriteStringInt(b, v);
+                        WriteStringInt(b, v, caller, path, line);
                     else
-                        Write(b, v);
+                        Write(b, v, caller, path, line);
                 }
                 break;
-            default: throw new Exception($"Type {value.GetType()} not supported by Writer");
+            default: throw new Exception($"Type {value.GetType()} not supported by Writer via {caller} \n\t at {path} L.{line}");
         }
     }
 }

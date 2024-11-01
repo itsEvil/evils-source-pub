@@ -8,6 +8,9 @@ public readonly struct Register : IReceive {
     public readonly string Password;
     public readonly string Name;
     public Register(Reader r, Span<byte> b) {
+        //Version
+        _ = r.Byte(b);
+
         Email = r.StringShort(b);
         Password = r.StringShort(b);
         Name = r.StringShort(b);

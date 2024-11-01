@@ -1,4 +1,6 @@
-﻿using Shared;
+﻿using GameServer.Core;
+using GameServer.Game.Objects;
+using Shared;
 using Shared.GameData;
 using System;
 using System.Collections.Generic;
@@ -11,8 +13,9 @@ namespace GameServer.Game.Worlds;
 public sealed class Map {
 
     public readonly Dictionary<Region, List<Vector2UInt>> Regions = [];
-
-    //public readonly Dictionary<Vector2Byte, List<Region>> Regions = []; //Allows for multiple regions on top of eachother
+    
+    //todo add static objects
+    public readonly Dictionary<Vector2UInt, Entity> StaticObjects = [];
 
     public readonly byte ChunkSizeWidth;
     public readonly byte ChunkSizeHeight;
@@ -135,6 +138,34 @@ public sealed class Map {
             SLog.Debug("Failed to find position {0} in {1} regions list", args: [position.ToString(),  region]);
             return false;
         }
+
+        return true;
+    }
+
+    public bool IsUnblocked(float x, float y)
+    {
+        var actualX = (uint)Math.Abs(x);
+        var actualY = (uint)y;
+        var chunk = GetChunk(actualX, actualY);
+
+        if (chunk == null) {
+            return false;
+        }
+
+        var tileX = actualX % ChunkSizeWidth;
+        var tileY = actualY % ChunkSizeHeight;
+        var tile = chunk.GetTile(tileX, tileY);
+
+        if(tile <= 0) {
+            return false;
+        }
+
+        var desc = Application.Instance.Resources.Id2Tile[tile];
+
+        if (desc.NoWalk)
+            return false;
+
+        //todo check static object
 
         return true;
     }

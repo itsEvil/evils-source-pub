@@ -28,13 +28,16 @@
     <None Update="Data\Game\Worlds\Worlds.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Data\Game\Xmls\ExampleItems.xml">
+    <None Update="Data\Game\Xmls\Classes.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Data\Game\Xmls\ExamplePlayers.xml">
+    <None Update="Data\Game\Xmls\Empty.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Data\Game\Xmls\Example.xml">
+    <None Update="Data\Game\Xmls\Items.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Game\Xmls\Tiles.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

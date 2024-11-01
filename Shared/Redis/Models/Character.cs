@@ -10,10 +10,10 @@ public sealed class Character : RedisObject, IWriteable
     public uint Level { get => GetValue<uint>("level", 0); set => SetValue("level", value); }
     public uint Exp { get => GetValue<uint>("exp", 0); set => SetValue("exp", value); }
     public uint ExpGoal { get => GetValue<uint>("expGoal", 0); set => SetValue("expGoal", value); }
-    public DateTime LastPlayed { get => GetValue<DateTime>("lastPlayed"); set => SetValue("lastPlayed", value); }
-    public uint[] Stats { get => GetValue<uint[]>("stats"); set => SetValue("stats", value); }
-    public uint[] MaxStats { get => GetValue<uint[]>("maxStats"); set => SetValue("maxStats", value); }
-    public ItemData[] Inventory { get => GetValue<ItemData[]>("inventory"); set => SetValue("inventory", value); }
+    public DateTime LastPlayed { get => GetValue<DateTime>("lastPlayed", DateTime.MinValue); set => SetValue("lastPlayed", value); }
+    public uint[] Attributes { get => GetValue<uint[]>("attributes", []); set => SetValue("attributes", value); }
+    public uint[] MaxAttributes { get => GetValue<uint[]>("maxAttributes", []); set => SetValue("maxAttributes", value); }
+    public ItemData[] Inventory { get => GetValue<ItemData[]>("inventory", []); set => SetValue("inventory", value); }
 
     public Character(Account acc, uint charId, bool isAsync = false) : base(acc.Database, $"char.{acc.Id}.{charId}", null, isAsync)
     {
@@ -23,6 +23,9 @@ public sealed class Character : RedisObject, IWriteable
     }
 
     public void Write(Writer w, Span<byte> b) {
+        //Version
+        w.Write(b, (byte)0);
+        
         w.Write(b, Id);
         w.Write(b, ClassId);
         w.Write(b, Fame);
@@ -31,16 +34,16 @@ public sealed class Character : RedisObject, IWriteable
         w.Write(b, ExpGoal);
         w.Write(b, LastPlayed.Ticks);
 
-        w.Write(b, (byte)Stats.Length);
-        for (int i = 0; i < Stats.Length; i++)
-            w.Write(b, Stats[i]);
+        w.Write(b, (byte)Attributes.Length);
+        for (int i = 0; i < Attributes.Length; i++)
+            w.Write(b, Attributes[i]);
 
-        w.Write(b, (byte)MaxStats.Length);
-        for (int i = 0; i < MaxStats.Length; i++)
-            w.Write(b, MaxStats[i]);
+        w.Write(b, (byte)MaxAttributes.Length);
+        for (int i = 0; i < MaxAttributes.Length; i++)
+            w.Write(b, MaxAttributes[i]);
 
         w.Write(b, (byte)Inventory.Length);
-        for(int i = 0; i <  Inventory.Length; i++)
+        for(int i = 0; i < Inventory.Length; i++)
             Inventory[i].Write(w, b);
     }
 }

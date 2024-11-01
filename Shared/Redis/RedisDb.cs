@@ -139,14 +139,16 @@ public sealed class RedisDb {
     public Character CreateCharacter(Account account, PlayerDesc desc) {        
         var newId = account.NextCharId++;
         var character = new Character(account, newId) {
-            Stats = [.. desc.StatValues],
-            MaxStats = [.. desc.StatMaxValues],
+            Attributes = [.. desc.StatValues],
+            MaxAttributes = [.. desc.StatMaxValues],
             Inventory = [.. desc.Inventory],
             Level = desc.Level,
             Exp = desc.Exp,
             ExpGoal = desc.ExpGoal,
         };
 
+        account.Alive = [.. account.Alive, character.Id];
+        account.FlushAsync();
         character.FlushAsync();
         return character;
     }

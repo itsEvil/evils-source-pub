@@ -32,6 +32,20 @@ public sealed class Chunk : IWriteable {
         get => Get(x,y);
         set => Set(x,y, value);
     }
+    public uint GetTile(uint x, uint y)
+    {
+        var tileIdx = Width * x + y;
+
+#if DEBUG
+        if (tileIdx < 0 || tileIdx >= Tiles.Length)
+        {
+            SLog.Debug("Tile at {0} is out of bounds, max value {1}", args: [tileIdx, Tiles.Length - 1]);
+            return 0;
+        }
+#endif
+
+        return Tiles[tileIdx];
+    }
     public uint Get(uint x, uint y) {
 #if DEBUG
         if (x < 0 || y < 0 || x > Width || y > Height)

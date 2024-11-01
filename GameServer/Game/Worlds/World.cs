@@ -1,7 +1,9 @@
 ﻿using GameServer.Game.Objects;
 using Shared;
 using Shared.GameData;
+using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 namespace GameServer.Game.Worlds;
@@ -24,6 +26,10 @@ public class World : IDisposable
     public readonly uint Id;
     public readonly WorldDesc Desc;
     public readonly bool IsEmpty = false;
+
+    public readonly Stopwatch Watch = Stopwatch.StartNew();
+
+    public bool RequiresOxygen = false;
 
     [JsonIgnore] public Map Map;
     public World(uint worldId, WorldDesc worldDesc, bool isEmpty = false) {
@@ -60,8 +66,13 @@ public class World : IDisposable
     }
 
     public bool ValidatePosition(Vector2 position) {
+
         if (position.X < 0 || position.Y < 0 || position.X > Map.Width || position.Y > Map.Height)
             return false;
+
+        var chunk = Map.GetChunk((uint)position.X, (uint)position.Y);
+
+        var tile = chunk.Get((uint)position.X, (uint)position.Y);
 
         //check if there is a wall object here
         //if so return false as they would be no clipping
@@ -155,5 +166,13 @@ public class World : IDisposable
     public void Dispose()
     {
         
+    }
+    public List<Vector2UInt> GetRegionPositions(Region region) {
+        if (!Map.Regions.TryGetValue(region, out var locations)) {
+            SLog.Error("Failed to find region {0} on map {1}", args: [region, Desc.ToString()]);
+            return [];
+        }
+
+        return locations;
     }
 }
