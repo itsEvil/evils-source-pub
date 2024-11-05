@@ -64,6 +64,8 @@ public class TcpClient
     }
     public void Reset()
     {
+        m_Send.Reset();
+        m_Receive.Reset();
         m_SendPackets.Clear();
         m_ReceivePackets.Clear();
     }
@@ -82,6 +84,7 @@ public class TcpClient
     }
     public void BeginReceive()
     {
+        Reset();
         m_ReceiveThread = Task.Run(TickReceive);
     }
     public void Tick(Client client)

@@ -66,6 +66,7 @@ public readonly struct LoadAck : ISend {
         ChunkWidth = chunkWidth;
         ChunkHeight = chunkHeight;
         DisplayNames = displayNames;
+        PlayerId = playerId;
     }
     public void Write(Writer w, Span<byte> b) {
         w.Write(b, WorldName);
@@ -75,5 +76,6 @@ public readonly struct LoadAck : ISend {
         w.Write(b, ChunkWidth);
         w.Write(b, ChunkHeight);
         w.Write(b, DisplayNames);
+        w.Write(b, PlayerId);
     }
 }

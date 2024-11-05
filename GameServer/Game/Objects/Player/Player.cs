@@ -22,7 +22,6 @@ public partial class Player : Entity {
     }
     public override Task Tick()
     {
-        SendNewTick();
 
         return base.Tick();
     }

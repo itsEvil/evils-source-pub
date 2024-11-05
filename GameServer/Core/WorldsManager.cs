@@ -76,12 +76,15 @@ public sealed class WorldsManager {
         return null;
     }
 
-    public async void Tick() {
+    public void Tick() {
         foreach (var (_, world) in Worlds)
-            WorldTasks.Add(world.Tick());
+            world.Tick();
 
-        await Task.WhenAll(WorldTasks);
-        WorldTasks.Clear();
+        //foreach (var (_, world) in Worlds)
+        //    WorldTasks.Add(world.Tick());
+        //
+        //await Task.WhenAll(WorldTasks);
+        //WorldTasks.Clear();
     }
     private uint GetNextWorldId() {
         NextWorldId -= 1;

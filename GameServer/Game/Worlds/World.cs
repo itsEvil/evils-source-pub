@@ -1,4 +1,5 @@
-﻿using GameServer.Game.Objects;
+﻿using GameServer.Core;
+using GameServer.Game.Objects;
 using Shared;
 using Shared.GameData;
 using System.Diagnostics;
@@ -50,6 +51,7 @@ public class World : IDisposable
 
     public void Enter(Entity entity, Vector2 at) {
         entity.Position = at;
+        entity.World = this;
 
         switch (entity) {
             case Player player:
@@ -74,10 +76,14 @@ public class World : IDisposable
 
         var tile = chunk.Get((uint)position.X, (uint)position.Y);
 
+        if(!Application.Instance.Resources.Id2Tile.TryGetValue(tile, out var desc)) {
+            SLog.Debug("Failed to find tile id {0}", args: [tile]);
+            return false;
+        }
+
         //check if there is a wall object here
         //if so return false as they would be no clipping
-
-        return true;
+        return !desc.NoWalk;
     }
 
     public Vector2 GetSpawnPoint() {
@@ -102,6 +108,9 @@ public class World : IDisposable
             Entities[entity.UniqueId] = entity;
             entity.Enter(this);
         }
+
+        ToAddPlayer.Clear();
+        ToAddEntity.Clear();
     }
 
     private void Remove() {
@@ -127,30 +136,32 @@ public class World : IDisposable
         {
             SLog.Error(e);
         }
+
+        ToRemovePlayer.Clear();
+        ToRemoveEntity.Clear();
     }
 
-    public async Task Tick() {
+    public void Tick() {
         Update();
 
         Add();
         Remove();
 
-        PlayerUpdates.Clear();
-        EntityUpdates.Clear();
+        //PlayerUpdates.Clear();
+        //EntityUpdates.Clear();
 
         //Start ticking all of the players and entities
-        foreach (var (_, player) in Players)
-            PlayerUpdates.Add(player.Tick());
-        
-
         foreach (var (_, entity) in Entities)
-            EntityUpdates.Add(entity.Tick());
+            entity.Tick();
+
+        foreach (var (_, player) in Players)
+            player.Tick();
 
         //Await all of the tasks
         //Player updates will likely take longer so we start them first
         //await SetNearby();
-        await Task.WhenAll(PlayerUpdates);
-        await Task.WhenAll(EntityUpdates);
+        //await Task.WhenAll(PlayerUpdates);
+        //await Task.WhenAll(EntityUpdates);
     }
 
     //private Task SetNearby() {

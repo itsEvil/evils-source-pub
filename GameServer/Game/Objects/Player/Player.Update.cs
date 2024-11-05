@@ -39,11 +39,12 @@ public partial class Player  {
     }
 
     public void OnMove() {
-        var x = (uint)Math.Abs(Position.X);
-        var y = (uint)Position.Y;
-
         var map = World.Map;
-		var centerPos = map.ChunkSizeWidth * x + y;
+        var playerX = (uint)Math.Abs(Position.X);
+        var playerY = (uint)Position.Y;
+        uint x = (uint)(playerX / map.ChunkWidth);
+        uint y = (uint)(playerY / map.ChunkHeight);
+		var centerPos = map.ChunkWidth * x + y;
         //var centerPos = x + y * Map.ChunkSize;
         var currentChunk = map.GetChunk(centerPos);
         //Position has not changed enough to send new chunks
@@ -158,10 +159,9 @@ public partial class Player  {
         if (NewEntities.Count != 0)
         {
             m_NewEntityInfos.Clear();
-            var idx = 0;
             while (NewEntities.TryDequeue(out var entity))
             {
-                m_NewEntityInfos[idx++] = new ObjectInfo(entity.ObjectId, entity.UniqueId, entity.Position);
+                m_NewEntityInfos.Add(new ObjectInfo(entity.ObjectId, entity.UniqueId, entity.Position));
                 SentEntities.Enqueue(entity);
             }
             
@@ -172,10 +172,9 @@ public partial class Player  {
         {
             m_Drops.Clear();
 
-            var idx = 0;
             while(ToRemoveEntities.TryDequeue(out var entity))
             {
-                m_Drops[idx++] = entity.UniqueId;
+                m_Drops.Add(entity.UniqueId);
                 //SentEntities.Remove(entity);
             }
 
