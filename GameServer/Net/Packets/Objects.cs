@@ -17,18 +17,21 @@ public readonly struct Objects(List<ObjectInfo> newObjects) : ISend {
 }
 
 public sealed class ObjectInfo : IWriteable {
-    public readonly uint Id;
-    public readonly uint UniqueId;
+    public readonly uint Id; //Object Id from Game data
+    public readonly uint UniqueId; //Id reference to this object
+    public readonly byte ClassType;
     public readonly Vector2 Position;
-    public ObjectInfo(uint id, uint uniqueId, Vector2 position) {
+    public ObjectInfo(uint id, uint uniqueId, byte classType, Vector2 position) {
         Id = id;
         UniqueId = uniqueId;
         Position = position;
+        ClassType = classType;
     }
     public ObjectInfo(Reader r, Span<byte> b) {
         UniqueId = r.UInt(b);
         Id = r.UInt(b);
         Position = new Vector2(r.Float(b), r.Float(b));
+        ClassType = r.Byte(b);
     }
     public void Write(Writer w, Span<byte> b)
     {
@@ -36,6 +39,7 @@ public sealed class ObjectInfo : IWriteable {
         w.Write(b, Id);
         w.Write(b, Position.X);
         w.Write(b, Position.Y);
+        w.Write(b, ClassType);
     }
 }
 

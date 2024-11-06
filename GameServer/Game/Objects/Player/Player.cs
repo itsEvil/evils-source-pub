@@ -17,6 +17,11 @@ public partial class Player : Entity {
 
         InitInventory();
     }
+    public override void Init(ObjectDesc descriptor)
+    {
+        base.Init(descriptor);
+
+    }
     protected override void Export(Dictionary<StatType, object> stats) {
         stats[StatType.Name] = Name;
     }

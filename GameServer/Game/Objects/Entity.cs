@@ -1,6 +1,8 @@
-﻿using GameServer.Game.Worlds;
+﻿using GameServer.Core;
+using GameServer.Game.Worlds;
 using Shared;
 using Shared.GameData;
+using System.Net.Security;
 using System.Numerics;
 
 namespace GameServer.Game.Objects;
@@ -18,6 +20,7 @@ public class Entity {
 
     public readonly uint UniqueId;
     public readonly uint ObjectId;
+    public ClassType ClassType;
 
     public float Speed_Multiplier = 1.0f;
     public float Damage_Multiplier = 1.0f;
@@ -51,6 +54,8 @@ public class Entity {
 #if DEBUG
         PrivName = string.Format("{0}-{1}", UniqueId, ObjectId);
 #endif
+        
+
 
         InitEffects();
     }
@@ -59,6 +64,12 @@ public class Entity {
         Stats[StatType.MaxHealth] = MaxHp;
 
         Export(Stats);
+    }
+
+    public virtual void Init(ObjectDesc descriptor)
+    {
+        ClassType = descriptor.Class;
+
     }
 
     public virtual Task Tick() {

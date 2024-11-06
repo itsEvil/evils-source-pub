@@ -161,7 +161,7 @@ public partial class Player  {
             m_NewEntityInfos.Clear();
             while (NewEntities.TryDequeue(out var entity))
             {
-                m_NewEntityInfos.Add(new ObjectInfo(entity.ObjectId, entity.UniqueId, entity.Position));
+                m_NewEntityInfos.Add(new ObjectInfo(entity.ObjectId, entity.UniqueId, (byte)entity.ClassType, entity.Position));
                 SentEntities.Enqueue(entity);
             }
             

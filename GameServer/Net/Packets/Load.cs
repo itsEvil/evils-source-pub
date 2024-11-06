@@ -42,6 +42,7 @@ public readonly struct Load : IReceive {
         client.Character.FlushAsync();
 
         client.Player = new Player(client, world.GetNextId(), client.Character.ClassId);
+        client.Player.Init(Application.Instance.Resources.Id2Player[client.Character.ClassId]);
         world.Enter(client.Player, world.GetSpawnPoint());
 
         client.Tcp.EnqueueSend(new LoadAck(world.Desc.Name, world.Desc.Description, world.Map.Width, world.Map.Height, world.Map.ChunkSizeWidth, world.Map.ChunkSizeHeight, world.Desc.DisplayNames, client.Player.UniqueId));
